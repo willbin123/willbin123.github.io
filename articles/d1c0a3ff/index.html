@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clustering and dimeonsionality reduction techniques combined | Anti-AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0d1117; color: #c9d1d9; line-height: 1.7;
+        }
+        .nav {
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 15px 20px; position: sticky; top: 0; z-index: 100;
+        }
+        .nav a { color: #58a6ff; text-decoration: none; font-size: 1.1em; }
+        .nav a:hover { text-decoration: underline; }
+        .article-header {
+            max-width: 800px; margin: 0 auto; padding: 40px 20px 20px;
+            border-bottom: 1px solid #30363d;
+        }
+        .article-header h1 { font-size: 2em; color: #e6edf3; margin-bottom: 15px; }
+        .article-meta { color: #8b949e; font-size: 0.9em; display: flex; gap: 20px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-body {
+            max-width: 800px; margin: 0 auto; padding: 30px 20px;
+        }
+        .article-body h1, .article-body h2, .article-body h3 { color: #e6edf3; margin: 25px 0 12px; }
+        .article-body h1 { font-size: 1.6em; }
+        .article-body h2 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .article-body h3 { font-size: 1.2em; }
+        .article-body p { margin: 12px 0; }
+        .article-body a { color: #58a6ff; }
+        .article-body code {
+            background: #1c2128; padding: 2px 6px; border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; color: #f0883e;
+        }
+        .article-body pre {
+            background: #1c2128; padding: 16px; border-radius: 8px; overflow-x: auto;
+            border: 1px solid #30363d; margin: 15px 0;
+        }
+        .article-body pre code { background: none; padding: 0; color: #c9d1d9; }
+        .article-body img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+        .article-body blockquote {
+            border-left: 3px solid #58a6ff; padding-left: 15px; margin: 15px 0;
+            color: #8b949e;
+        }
+        .article-body ul, .article-body ol { padding-left: 25px; margin: 12px 0; }
+        .article-body li { margin: 6px 0; }
+        .article-body table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        .article-body th, .article-body td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .article-body th { background: #161b22; }
+        .article-footer {
+            max-width: 800px; margin: 0 auto; padding: 20px;
+            border-top: 1px solid #30363d; color: #8b949e; font-size: 0.85em;
+        }
+        .article-footer a { color: #58a6ff; }
+        .disclaimer {
+            background: rgba(136, 136, 136, 0.1); border: 1px solid #30363d;
+            border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.85em; color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="/">&larr; 返回首页</a></div>
+    <div class="article-header">
+        <h1>Clustering and dimeonsionality reduction techniques combined</h1>
+        <div class="article-meta">
+            <span>&#128197; 2026-08-05</span>
+            <span>&#128100; Unknown</span>
+            <span class="tag">BSD-2-CLAUSE</span>
+            
+        </div>
+    </div>
+    <div class="article-body">
+        
+                <div class="disclaimer">
+                    <p><strong>&#9888; 转载声明</strong></p>
+                    <p>本文转载自 GitHub 开源项目，原作者: <strong>Unknown</strong></p>
+                    <p>原文地址: <a href="" target="_blank" rel="noopener"></a></p>
+                    <p>许可证: BSD-2-CLAUSE</p>
+                </div>
+            
+        <blockquote><strong>转载声明</strong> | 本文转载自 GitHub 开源项目 <a href="https://github.com/tirthajyoti/Machine-Learning-with-Python" target="_blank" rel="noopener">tirthajyoti/Machine-Learning-with-Python</a></blockquote>
+<blockquote>原作者: <strong>tirthajyoti</strong> | 文件: <code>Clustering-Dimensionality-Reduction/Clustering_with_dim_reduction.ipynb</code></blockquote>
+<blockquote>许可证: BSD-2-CLAUSE | Stars: ★3322</blockquote>
+<blockquote>项目描述: Practice and tutorial-style notebooks  covering wide variety of machine learning techniques</blockquote>
+<hr>
+<h1>Clustering and dimeonsionality reduction techniques combined</h1>
+<h3>Dr. Tirthajyoti Sarkar, Fremont, CA 94536</h3>
+<p>In this notebook, we show how the clustering performance changes when dimensionality reduction techniques like Principal component analysis (PCA), Independent component analysis (ICA), or Random projections (RP) is combined with algorithms like k-means.</p>
+<p><a href="https://en.wikipedia.org/wiki/K-means_clustering" target="_blank" rel="noopener">Read about ___k-means clustering algorithm___ here.</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis" target="_blank" rel="noopener">Read about ___principal component analysis___ here</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Independent_component_analysis" target="_blank" rel="noopener">Read about ___independent component analysis___ here</a></p>
+<hr>
+<pre><code class="python">
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+</code></pre>
+<h3>Create synthetic data using Scikit learn <code>make_blob</code> method</h3>
+<ul>
+<li>Number of features: 8</li>
+<li>Number of clusters: 5</li>
+<li>Number of samples: 1000</li>
+</ul>
+<pre><code class="python">
+from sklearn.datasets import make_classification
+from sklearn.datasets import make_blobs
+</code></pre>
+<pre><code class="python">
+n_features = 8
+n_cluster = 5
+cluster_std = 1.5
+n_samples = 1000
+</code></pre>
+<pre><code class="python">
+data1 = make_blobs(n_samples=n_samples,n_features=n_features,centers=n_cluster,cluster_std=cluster_std)
+</code></pre>
+<pre><code class="python">
+d1 = data1[0]
+</code></pre>
+<pre><code class="python">
+df1=pd.DataFrame(data=d1,columns=['Feature_'+str(i) for i in range(1,n_features+1)])
+df1.head()
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>Feature_1</th></p>
+<p><th>Feature_2</th></p>
+<p><th>Feature_3</th></p>
+<p><th>Feature_4</th></p>
+<p><th>Feature_5</th></p>
+<p><th>Feature_6</th></p>
+<p><th>Feature_7</th></p>
+<p><th>Feature_8</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>0</th></p>
+<p><td>4.990792</td></p>
+<p><td>-9.082767</td></p>
+<p><td>0.871791</td></p>
+<p><td>6.390657</td></p>
+<p><td>5.444735</td></p>
+<p><td>3.212907</td></p>
+<p><td>6.482452</td></p>
+<p><td>4.218963</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>1</th></p>
+<p><td>-0.780449</td></p>
+<p><td>-12.622474</td></p>
+<p><td>7.437650</td></p>
+<p><td>-1.275347</td></p>
+<p><td>-2.242999</td></p>
+<p><td>-3.284408</td></p>
+<p><td>-2.048555</td></p>
+<p><td>-8.954361</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>2</th></p>
+<p><td>5.034591</td></p>
+<p><td>-1.545604</td></p>
+<p><td>-0.460813</td></p>
+<p><td>3.027779</td></p>
+<p><td>9.293984</td></p>
+<p><td>7.316454</td></p>
+<p><td>6.107114</td></p>
+<p><td>8.497053</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>3</th></p>
+<p><td>6.176798</td></p>
+<p><td>8.984814</td></p>
+<p><td>-4.243014</td></p>
+<p><td>6.700406</td></p>
+<p><td>1.998104</td></p>
+<p><td>2.401363</td></p>
+<p><td>-4.064555</td></p>
+<p><td>7.153372</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>4</th></p>
+<p><td>7.008987</td></p>
+<p><td>-3.820839</td></p>
+<p><td>-5.036936</td></p>
+<p><td>1.539823</td></p>
+<p><td>9.681852</td></p>
+<p><td>7.820287</td></p>
+<p><td>4.538459</td></p>
+<p><td>3.799924</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<pre><code class="python">
+from itertools import combinations
+</code></pre>
+<pre><code class="python">
+lst_vars=list(combinations(df1.columns,2))
+</code></pre>
+<pre><code class="python">
+len(lst_vars)
+</code></pre>
+<p>28</p>
+<pre><code class="python">
+plt.figure(figsize=(21,35))
+for i in range(1,29):
+    plt.subplot(7,4,i)
+    dim1=lst_vars[i-1][0]
+    dim2=lst_vars[i-1][1]
+    plt.scatter(df1[dim1],df1[dim2],c=data1[1],edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+</code></pre>
+<img src="output_11_0.png" alt="png">
+<pre><code class="python">
+df1.describe().transpose()
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>count</th></p>
+<p><th>mean</th></p>
+<p><th>std</th></p>
+<p><th>min</th></p>
+<p><th>25%</th></p>
+<p><th>50%</th></p>
+<p><th>75%</th></p>
+<p><th>max</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>Feature_1</th></p>
+<p><td>1000.0</td></p>
+<p><td>1.874842</td></p>
+<p><td>4.615221</td></p>
+<p><td>-8.222017</td></p>
+<p><td>-2.294379</td></p>
+<p><td>3.323308</td></p>
+<p><td>5.665790</td></p>
+<p><td>11.069784</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_2</th></p>
+<p><td>1000.0</td></p>
+<p><td>-0.938015</td></p>
+<p><td>7.618353</td></p>
+<p><td>-14.352415</td></p>
+<p><td>-8.231011</td></p>
+<p><td>-2.480599</td></p>
+<p><td>7.252676</td></p>
+<p><td>13.106073</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_3</th></p>
+<p><td>1000.0</td></p>
+<p><td>1.831234</td></p>
+<p><td>4.967307</td></p>
+<p><td>-9.200553</td></p>
+<p><td>-2.860654</td></p>
+<p><td>1.643230</td></p>
+<p><td>6.355300</td></p>
+<p><td>12.156411</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_4</th></p>
+<p><td>1000.0</td></p>
+<p><td>0.768340</td></p>
+<p><td>5.801737</td></p>
+<p><td>-11.430412</td></p>
+<p><td>-5.011437</td></p>
+<p><td>1.789814</td></p>
+<p><td>6.244834</td></p>
+<p><td>11.363553</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_5</th></p>
+<p><td>1000.0</td></p>
+<p><td>1.063925</td></p>
+<p><td>5.527578</td></p>
+<p><td>-9.728875</td></p>
+<p><td>-4.045152</td></p>
+<p><td>1.405833</td></p>
+<p><td>4.289386</td></p>
+<p><td>13.329279</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_6</th></p>
+<p><td>1000.0</td></p>
+<p><td>3.020933</td></p>
+<p><td>3.854725</td></p>
+<p><td>-6.194714</td></p>
+<p><td>0.452646</td></p>
+<p><td>2.849934</td></p>
+<p><td>5.334712</td></p>
+<p><td>12.580610</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_7</th></p>
+<p><td>1000.0</td></p>
+<p><td>1.678986</td></p>
+<p><td>4.519915</td></p>
+<p><td>-9.058462</td></p>
+<p><td>-1.734491</td></p>
+<p><td>1.750337</td></p>
+<p><td>5.033749</td></p>
+<p><td>12.039876</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Feature_8</th></p>
+<p><td>1000.0</td></p>
+<p><td>0.462195</td></p>
+<p><td>6.879904</td></p>
+<p><td>-12.239055</td></p>
+<p><td>-7.178045</td></p>
+<p><td>3.887900</td></p>
+<p><td>6.278190</td></p>
+<p><td>11.642779</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<h3>How are the classes separated (boxplots)</h3>
+<pre><code class="python">
+plt.figure(figsize=(21,15))
+for i,c in enumerate(df1.columns):
+    plt.subplot(3,3,i+1)
+    sns.boxplot(y=df1[c],x=data1[1])
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.xlabel("Class",fontsize=15)
+    plt.ylabel(c,fontsize=15)
+    #plt.show()
+</code></pre>
+<img src="output_14_0.png" alt="png">
+<h2>k-means clustering</h2>
+<pre><code class="python">
+from sklearn.cluster import KMeans
+</code></pre>
+<h3>Unlabled data</h3>
+<pre><code class="python">
+X=df1
+</code></pre>
+<pre><code class="python">
+X.head()
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>Feature_1</th></p>
+<p><th>Feature_2</th></p>
+<p><th>Feature_3</th></p>
+<p><th>Feature_4</th></p>
+<p><th>Feature_5</th></p>
+<p><th>Feature_6</th></p>
+<p><th>Feature_7</th></p>
+<p><th>Feature_8</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>0</th></p>
+<p><td>4.990792</td></p>
+<p><td>-9.082767</td></p>
+<p><td>0.871791</td></p>
+<p><td>6.390657</td></p>
+<p><td>5.444735</td></p>
+<p><td>3.212907</td></p>
+<p><td>6.482452</td></p>
+<p><td>4.218963</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>1</th></p>
+<p><td>-0.780449</td></p>
+<p><td>-12.622474</td></p>
+<p><td>7.437650</td></p>
+<p><td>-1.275347</td></p>
+<p><td>-2.242999</td></p>
+<p><td>-3.284408</td></p>
+<p><td>-2.048555</td></p>
+<p><td>-8.954361</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>2</th></p>
+<p><td>5.034591</td></p>
+<p><td>-1.545604</td></p>
+<p><td>-0.460813</td></p>
+<p><td>3.027779</td></p>
+<p><td>9.293984</td></p>
+<p><td>7.316454</td></p>
+<p><td>6.107114</td></p>
+<p><td>8.497053</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>3</th></p>
+<p><td>6.176798</td></p>
+<p><td>8.984814</td></p>
+<p><td>-4.243014</td></p>
+<p><td>6.700406</td></p>
+<p><td>1.998104</td></p>
+<p><td>2.401363</td></p>
+<p><td>-4.064555</td></p>
+<p><td>7.153372</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>4</th></p>
+<p><td>7.008987</td></p>
+<p><td>-3.820839</td></p>
+<p><td>-5.036936</td></p>
+<p><td>1.539823</td></p>
+<p><td>9.681852</td></p>
+<p><td>7.820287</td></p>
+<p><td>4.538459</td></p>
+<p><td>3.799924</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<pre><code class="python">
+y=data1[1]
+</code></pre>
+<h3>Scaling</h3>
+<pre><code class="python">
+from sklearn.preprocessing import MinMaxScaler
+</code></pre>
+<pre><code class="python">
+scaler = MinMaxScaler()
+</code></pre>
+<pre><code class="python">
+X_scaled=scaler.fit_transform(X)
+</code></pre>
+<h3>Metrics</h3>
+<pre><code class="python">
+from sklearn.metrics import silhouette_score, adjusted_rand_score, completeness_score, v_measure_score
+</code></pre>
+<h3>Running k-means and computing inter-cluster distance score for various <em>k</em> values</h3>
+<pre><code class="python">
+km_scores= []
+km_silhouette = []
+vmeasure_score =[]
+for i in range(2,12):
+    km = KMeans(n_clusters=i, random_state=0).fit(X_scaled)
+    preds = km.predict(X_scaled)
+    print("Score for number of cluster(s) {}: {}".format(i,km.score(X_scaled)))
+    km_scores.append(-km.score(X_scaled))
+    silhouette = silhouette_score(X_scaled,preds)
+    km_silhouette.append(silhouette)
+    print("Silhouette score for number of cluster(s) {}: {}".format(i,silhouette))
+    v_measure = v_measure_score(y,preds)
+    vmeasure_score.append(v_measure)
+    print("V-measure score for number of cluster(s) {}: {}".format(i,v_measure))
+    print("-"*100)
+</code></pre>
+<p>Score for number of cluster(s) 2: -213.1758037542726</p>
+<p>Silhouette score for number of cluster(s) 2: 0.5179955731810493</p>
+<p>V-measure score for number of cluster(s) 2: 0.589727521756156</p>
+<hr>
+<p>Score for number of cluster(s) 3: -132.31298351903592</p>
+<p>Silhouette score for number of cluster(s) 3: 0.5452456612835003</p>
+<p>V-measure score for number of cluster(s) 3: 0.7918756684685214</p>
+<hr>
+<p>Score for number of cluster(s) 4: -75.69320825340654</p>
+<p>Silhouette score for number of cluster(s) 4: 0.5883194392034965</p>
+<p>V-measure score for number of cluster(s) 4: 0.9057460992755191</p>
+<hr>
+<p>Score for number of cluster(s) 5: -37.91115243106546</p>
+<p>Silhouette score for number of cluster(s) 5: 0.6387671277419532</p>
+<p>V-measure score for number of cluster(s) 5: 1.0</p>
+<hr>
+<p>Score for number of cluster(s) 6: -36.84004504133993</p>
+<p>Silhouette score for number of cluster(s) 6: 0.5302855388934143</p>
+<p>V-measure score for number of cluster(s) 6: 0.9588506333993962</p>
+<hr>
+<p>Score for number of cluster(s) 7: -35.90419466031982</p>
+<p>Silhouette score for number of cluster(s) 7: 0.4270823053988859</p>
+<p>V-measure score for number of cluster(s) 7: 0.9213826913495042</p>
+<hr>
+<p>Score for number of cluster(s) 8: -35.05916999675282</p>
+<p>Silhouette score for number of cluster(s) 8: 0.31555715232518894</p>
+<p>V-measure score for number of cluster(s) 8: 0.8871667413412285</p>
+<hr>
+<p>Score for number of cluster(s) 9: -34.142389586917844</p>
+<p>Silhouette score for number of cluster(s) 9: 0.22181582245292758</p>
+<p>V-measure score for number of cluster(s) 9: 0.853793907776424</p>
+<hr>
+<p>Score for number of cluster(s) 10: -33.6044235399825</p>
+<p>Silhouette score for number of cluster(s) 10: 0.20421873740807944</p>
+<p>V-measure score for number of cluster(s) 10: 0.8372003008716371</p>
+<hr>
+<p>Score for number of cluster(s) 11: -32.92337739474742</p>
+<p>Silhouette score for number of cluster(s) 11: 0.2211478394068502</p>
+<p>V-measure score for number of cluster(s) 11: 0.8192767948995617</p>
+<hr>
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=km_scores,s=150,edgecolor='k')
+plt.grid(True)
+plt.xlabel("K-means score")
+plt.show()
+</code></pre>
+<img src="output_29_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=vmeasure_score,s=150,edgecolor='k')
+plt.grid(True)
+plt.xlabel("V-measure score")
+plt.show()
+</code></pre>
+<img src="output_30_0.png" alt="png">
+<pre><code class="python">
+km = KMeans(n_clusters=5,n_init=10,max_iter=500).fit(X=X_scaled)
+</code></pre>
+<pre><code class="python">
+preds_km = km.predict(X_scaled)
+</code></pre>
+<pre><code class="python">
+plt.figure(figsize=(21,35))
+for i in range(1,29):
+    plt.subplot(7,4,i)
+    dim1=lst_vars[i-1][0]
+    dim2=lst_vars[i-1][1]
+    plt.scatter(df1[dim1],df1[dim2],c=preds_km,edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+</code></pre>
+<img src="output_33_0.png" alt="png">
+<h2>Expectation-maximization (Gaussian Mixture Model)</h2>
+<pre><code class="python">
+from sklearn.mixture import GaussianMixture
+</code></pre>
+<pre><code class="python">
+gm_bic= []
+gm_score=[]
+for i in range(2,12):
+    gm = GaussianMixture(n_components=i,n_init=10,tol=1e-3,max_iter=1000).fit(X_scaled)
+    print("BIC for number of cluster(s) {}: {}".format(i,gm.bic(X_scaled)))
+    print("Log-likelihood score for number of cluster(s) {}: {}".format(i,gm.score(X_scaled)))
+    print("-"*100)
+    gm_bic.append(-gm.bic(X_scaled))
+    gm_score.append(gm.score(X_scaled))
+</code></pre>
+<p>BIC for number of cluster(s) 2: -13205.496765075652</p>
+<p>Log-likelihood score for number of cluster(s) 2: 6.910143492452531</p>
+<hr>
+<p>BIC for number of cluster(s) 3: -14637.426300571624</p>
+<p>Log-likelihood score for number of cluster(s) 3: 7.781532753977616</p>
+<hr>
+<p>BIC for number of cluster(s) 4: -15303.962917465593</p>
+<p>Log-likelihood score for number of cluster(s) 4: 8.270225556201698</p>
+<hr>
+<p>BIC for number of cluster(s) 5: -15702.457074446324</p>
+<p>Log-likelihood score for number of cluster(s) 5: 8.624897128469161</p>
+<hr>
+<p>BIC for number of cluster(s) 6: -15477.506447060363</p>
+<p>Log-likelihood score for number of cluster(s) 6: 8.667846308553278</p>
+<hr>
+<p>BIC for number of cluster(s) 7: -15214.666615492124</p>
+<p>Log-likelihood score for number of cluster(s) 7: 8.691850886546257</p>
+<hr>
+<p>BIC for number of cluster(s) 8: -15023.699604918993</p>
+<p>Log-likelihood score for number of cluster(s) 8: 8.75179187503679</p>
+<hr>
+<p>BIC for number of cluster(s) 9: -14755.939717928928</p>
+<p>Log-likelihood score for number of cluster(s) 9: 8.773336425318856</p>
+<hr>
+<p>BIC for number of cluster(s) 10: -14516.729775488473</p>
+<p>Log-likelihood score for number of cluster(s) 10: 8.809155947875727</p>
+<hr>
+<p>BIC for number of cluster(s) 11: -14311.173584270315</p>
+<p>Log-likelihood score for number of cluster(s) 11: 8.861802346043746</p>
+<hr>
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=gm_bic,s=150,edgecolor='k')
+plt.grid(True)
+plt.xlabel("Gaussian mixture BIC score")
+plt.show()
+</code></pre>
+<img src="output_37_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=gm_score,s=150,edgecolor='k')
+plt.show()
+</code></pre>
+<img src="output_38_0.png" alt="png">
+<pre><code class="python">
+gm = GaussianMixture(n_components=5,verbose=1,n_init=10,tol=1e-2,covariance_type='full',max_iter=1000).fit(X_scaled)
+</code></pre>
+<p>Initialization 0</p>
+<p>Initialization converged: True</p>
+<p>Initialization 1</p>
+<p>Initialization converged: True</p>
+<p>Initialization 2</p>
+<p>Initialization converged: True</p>
+<p>Initialization 3</p>
+<p>Initialization converged: True</p>
+<p>Initialization 4</p>
+<p>Initialization converged: True</p>
+<p>Initialization 5</p>
+<p>Initialization converged: True</p>
+<p>Initialization 6</p>
+<p>Initialization converged: True</p>
+<p>Initialization 7</p>
+<p>Initialization converged: True</p>
+<p>Initialization 8</p>
+<p>Initialization converged: True</p>
+<p>Initialization 9</p>
+<p>Initialization converged: True</p>
+<pre><code class="python">
+gm.means_
+</code></pre>
+<p>array([[0.61066286, 0.24595866, 0.50882119, 0.79583393, 0.50800235,</p>
+<p>0.52657803, 0.80440139, 0.69289571],</p>
+<p>[0.16503566, 0.78284338, 0.70001494, 0.19921205, 0.18388743,</p>
+<p>0.51341416, 0.50556511, 0.2153751 ],</p>
+<p>[0.71154737, 0.82269434, 0.25442464, 0.79358186, 0.55272748,</p>
+<p>0.40369626, 0.20647585, 0.76115015],</p>
+<p>[0.36440956, 0.15767815, 0.82383377, 0.30696105, 0.26194466,</p>
+<p>0.21427132, 0.40122612, 0.16837208],</p>
+<p>[0.76522272, 0.43349463, 0.29561972, 0.58028422, 0.83378173,</p>
+<p>0.79623146, 0.62695091, 0.82139349]])</p>
+<pre><code class="python">
+km.cluster_centers_
+</code></pre>
+<p>array([[0.36440956, 0.15767815, 0.82383377, 0.30696105, 0.26194466,</p>
+<p>0.21427132, 0.40122612, 0.16837208],</p>
+<p>[0.61066286, 0.24595866, 0.50882119, 0.79583393, 0.50800235,</p>
+<p>0.52657803, 0.80440139, 0.69289571],</p>
+<p>[0.71154737, 0.82269434, 0.25442464, 0.79358186, 0.55272748,</p>
+<p>0.40369626, 0.20647585, 0.76115015],</p>
+<p>[0.76522272, 0.43349463, 0.29561972, 0.58028422, 0.83378173,</p>
+<p>0.79623146, 0.62695091, 0.82139349],</p>
+<p>[0.16503566, 0.78284338, 0.70001494, 0.19921205, 0.18388743,</p>
+<p>0.51341416, 0.50556511, 0.2153751 ]])</p>
+<pre><code class="python">
+gm.means_/km.cluster_centers_
+</code></pre>
+<p>array([[1.67575974, 1.55987791, 0.61762604, 2.59262184, 1.93934994,</p>
+<p>2.45752924, 2.00485797, 4.11526492],</p>
+<p>[0.27025658, 3.18282508, 1.37575824, 0.25031862, 0.36198145,</p>
+<p>0.97500111, 0.62849855, 0.31083337],</p>
+<p>[1.        , 1.        , 1.        , 1.        , 1.        ,</p>
+<ol>
+<li>       , 1.        , 1.        ],</li>
+</ol>
+<p>[0.47621372, 0.36373725, 2.78680245, 0.52898397, 0.31416454,</p>
+<p>0.26910682, 0.63996417, 0.20498346],</p>
+<p>[4.63671141, 0.55374376, 0.42230488, 2.9128972 , 4.53419656,</p>
+<p>1.55085604, 1.24009925, 3.81378105]])</p>
+<pre><code class="python">
+preds_gm=gm.predict(X_scaled)
+</code></pre>
+<pre><code class="python">
+km_rand_score = adjusted_rand_score(preds_km,y)
+</code></pre>
+<pre><code class="python">
+gm_rand_score = adjusted_rand_score(preds_gm,y)
+</code></pre>
+<pre><code class="python">
+print("Adjusted Rand score for k-means",km_rand_score)
+print("Adjusted Rand score for Gaussian Mixture model",gm_rand_score)
+</code></pre>
+<p>Adjusted Rand score for k-means 1.0</p>
+<p>Adjusted Rand score for Gaussian Mixture model 1.0</p>
+<pre><code class="python">
+silhouette_score(X_scaled,preds_km)
+</code></pre>
+<p>0.6387671277419532</p>
+<pre><code class="python">
+silhouette_score(X_scaled,preds_gm)
+</code></pre>
+<p>0.6387671277419532</p>
+<pre><code class="python">
+plt.figure(figsize=(21,35))
+for i in range(1,29):
+    plt.subplot(7,4,i)
+    dim1=lst_vars[i-1][0]
+    dim2=lst_vars[i-1][1]
+    plt.scatter(df1[dim1],df1[dim2],c=preds_gm,edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+</code></pre>
+<img src="output_49_0.png" alt="png">
+<h2>PCA</h2>
+<pre><code class="python">
+from sklearn.decomposition import PCA
+</code></pre>
+<pre><code class="python">
+n_prin_comp = 3
+</code></pre>
+<pre><code class="python">
+pca_partial = PCA(n_components=n_prin_comp,svd_solver='full')
+pca_partial.fit(X_scaled)
+</code></pre>
+<p>PCA(copy=True, iterated_power='auto', n_components=3, random_state=None,</p>
+<p>svd_solver='full', tol=0.0, whiten=False)</p>
+<pre><code class="python">
+pca_full = PCA(n_components=n_features,svd_solver='full')
+pca_full.fit(X_scaled)
+</code></pre>
+<p>PCA(copy=True, iterated_power='auto', n_components=8, random_state=None,</p>
+<p>svd_solver='full', tol=0.0, whiten=False)</p>
+<h3>How much variance is explained by principal components?</h3>
+<p>With the help of this plot, we can decide to work with only the first 3 principal components</p>
+<pre><code class="python">
+pca_explained_var = pca_full.explained_variance_ratio_
+</code></pre>
+<pre><code class="python">
+cum_explaiend_var = pca_explained_var.cumsum()
+</code></pre>
+<pre><code class="python">
+cum_explaiend_var
+</code></pre>
+<p>array([0.58557172, 0.79647933, 0.90715651, 0.95816582, 0.97028305,</p>
+<p>0.98184598, 0.99166691, 1.        ])</p>
+<pre><code class="python">
+plt.figure(figsize=(12,5))
+plt.bar(x=['PrComp'+str(i) for i in range(1,9)],height=cum_explaiend_var,width=0.6)
+plt.xticks(fontsize=14)
+plt.hlines(y=0.8,xmin='PrComp1',xmax='PrComp8',linestyles='dashed',lw=3)
+plt.text(x='PrComp1',y=0.82,s="80% variance explained",fontsize=15)
+plt.show()
+</code></pre>
+<img src="output_59_0.png" alt="png">
+<h3>Transform the original variables in principal component space and create a DataFrame</h3>
+<pre><code class="python">
+X_pca = pca_partial.fit_transform(X_scaled)
+</code></pre>
+<pre><code class="python">
+df_pca=pd.DataFrame(data=X_pca,columns=['Principal_comp'+str(i) for i in range(1,n_prin_comp+1)])
+</code></pre>
+<h3>Running k-means on the transformed features</h3>
+<pre><code class="python">
+km_scores= []
+km_silhouette = []
+vmeasure_score =[]
+for i in range(2,12):
+    km = KMeans(n_clusters=i, random_state=0).fit(X_pca)
+    preds = km.predict(X_pca)
+    print("Score for number of cluster(s) {}: {}".format(i,km.score(X_pca)))
+    km_scores.append(-km.score(X_pca))
+    silhouette = silhouette_score(X_pca,preds)
+    km_silhouette.append(silhouette)
+    print("Silhouette score for number of cluster(s) {}: {}".format(i,silhouette))
+    v_measure = v_measure_score(y,preds)
+    vmeasure_score.append(v_measure)
+    print("V-measure score for number of cluster(s) {}: {}".format(i,v_measure))
+    print("-"*100)
+</code></pre>
+<p>Score for number of cluster(s) 2: -169.09869011384518</p>
+<p>Silhouette score for number of cluster(s) 2: 0.5827325345032012</p>
+<p>V-measure score for number of cluster(s) 2: 0.589727521756156</p>
+<hr>
+<p>Score for number of cluster(s) 3: -88.24495218092622</p>
+<p>Silhouette score for number of cluster(s) 3: 0.6512420554486249</p>
+<p>V-measure score for number of cluster(s) 3: 0.7918756684685214</p>
+<hr>
+<p>Score for number of cluster(s) 4: -35.48809662182164</p>
+<p>Silhouette score for number of cluster(s) 4: 0.7220540399231042</p>
+<p>V-measure score for number of cluster(s) 4: 0.9057460992755191</p>
+<hr>
+<p>Score for number of cluster(s) 5: -13.337906664224475</p>
+<p>Silhouette score for number of cluster(s) 5: 0.7539386544728407</p>
+<p>V-measure score for number of cluster(s) 5: 1.0</p>
+<hr>
+<p>Score for number of cluster(s) 6: -12.531385925928053</p>
+<p>Silhouette score for number of cluster(s) 6: 0.6480525525545593</p>
+<p>V-measure score for number of cluster(s) 6: 0.958996688324508</p>
+<hr>
+<p>Score for number of cluster(s) 7: -11.861842218614076</p>
+<p>Silhouette score for number of cluster(s) 7: 0.538150249888098</p>
+<p>V-measure score for number of cluster(s) 7: 0.9220571615834375</p>
+<hr>
+<p>Score for number of cluster(s) 8: -11.18251040026136</p>
+<p>Silhouette score for number of cluster(s) 8: 0.4628881929029402</p>
+<p>V-measure score for number of cluster(s) 8: 0.8876009518457795</p>
+<hr>
+<p>Score for number of cluster(s) 9: -10.519485783973586</p>
+<p>Silhouette score for number of cluster(s) 9: 0.35106089541160035</p>
+<p>V-measure score for number of cluster(s) 9: 0.8552458476457342</p>
+<hr>
+<p>Score for number of cluster(s) 10: -10.003595399464967</p>
+<p>Silhouette score for number of cluster(s) 10: 0.3282526738872144</p>
+<p>V-measure score for number of cluster(s) 10: 0.836779827840773</p>
+<hr>
+<p>Score for number of cluster(s) 11: -9.366887124723513</p>
+<p>Silhouette score for number of cluster(s) 11: 0.2401866867060919</p>
+<p>V-measure score for number of cluster(s) 11: 0.8074029998590939</p>
+<hr>
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=km_scores,s=150,edgecolor='k')
+plt.grid(True)
+plt.xlabel("K-means scores")
+plt.show()
+</code></pre>
+<img src="output_65_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=vmeasure_score,s=150,edgecolor='k')
+plt.grid(True)
+plt.xlabel("V-measures scores")
+plt.show()
+</code></pre>
+<img src="output_66_0.png" alt="png">
+<h3>K-means fitting with PCA-transformed data</h3>
+<pre><code class="python">
+km_pca = KMeans(n_clusters=5,n_init=10,max_iter=500).fit(X=X_pca)
+preds_km_pca = km_pca.predict(X_pca)
+</code></pre>
+<h3>Visualizing the clusters after running k-means on PCA-transformed features</h3>
+<pre><code class="python">
+col_pca_combi=list(combinations(df_pca.columns,2))
+num_pca_combi = len(col_pca_combi)
+</code></pre>
+<pre><code class="python">
+plt.figure(figsize=(21,20))
+for i in range(1,num_pca_combi+1):
+    plt.subplot(int(num_pca_combi/3)+1,3,i)
+    dim1=col_pca_combi[i-1][0]
+    dim2=col_pca_combi[i-1][1]
+    plt.scatter(df_pca[dim1],df_pca[dim2],c=preds_km_pca,edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+</code></pre>
+<img src="output_71_0.png" alt="png">
+<h2>ICA</h2>
+<pre><code class="python">
+from sklearn.decomposition import FastICA
+</code></pre>
+<pre><code class="python">
+n_ind_comp = 3
+</code></pre>
+<pre><code class="python">
+ica_partial = FastICA(n_components=n_ind_comp)
+ica_partial.fit(X_scaled)
+</code></pre>
+<p>FastICA(algorithm='parallel', fun='logcosh', fun_args=None, max_iter=200,</p>
+<p>n_components=3, random_state=None, tol=0.0001, w_init=None,</p>
+<p>whiten=True)</p>
+<pre><code class="python">
+ica_full = FastICA(max_iter=1000)
+ica_full.fit(X_scaled)
+</code></pre>
+<p>c:\program files\python37\lib\site-packages\sklearn\decomposition\fastica_.py:119: ConvergenceWarning: FastICA did not converge. Consider increasing tolerance or the maximum number of iterations.</p>
+<p>ConvergenceWarning)</p>
+<p>FastICA(algorithm='parallel', fun='logcosh', fun_args=None, max_iter=1000,</p>
+<p>n_components=None, random_state=None, tol=0.0001, w_init=None,</p>
+<p>whiten=True)</p>
+<pre><code class="python">
+X_ica = ica_partial.fit_transform(X_scaled)
+</code></pre>
+<pre><code class="python">
+df_ica=pd.DataFrame(data=X_ica,columns=['Independent_comp'+str(i) for i in range(1,n_ind_comp+1)])
+</code></pre>
+<h3>Running k-means on the independent features</h3>
+<pre><code class="python">
+km_scores= []
+km_silhouette = []
+vmeasure_score =[]
+for i in range(2,12):
+    km = KMeans(n_clusters=i, random_state=0).fit(X_ica)
+    preds = km.predict(X_ica)
+    print("Score for number of cluster(s) {}: {}".format(i,km.score(X_ica)))
+    km_scores.append(-km.score(X_ica))
+    silhouette = silhouette_score(X_ica,preds)
+    km_silhouette.append(silhouette)
+    print("Silhouette score for number of cluster(s) {}: {}".format(i,silhouette))
+    v_measure = v_measure_score(y,preds)
+    vmeasure_score.append(v_measure)
+    print("V-measure score for number of cluster(s) {}: {}".format(i,v_measure))
+    print("-"*100)
+</code></pre>
+<p>Score for number of cluster(s) 2: -2.0442719579919104</p>
+<p>Silhouette score for number of cluster(s) 2: 0.39559077431646805</p>
+<p>V-measure score for number of cluster(s) 2: 0.589727521756156</p>
+<hr>
+<p>Score for number of cluster(s) 3: -1.1097853915466622</p>
+<p>Silhouette score for number of cluster(s) 3: 0.5660466485477773</p>
+<p>V-measure score for number of cluster(s) 3: 0.7918756684685213</p>
+<hr>
+<p>Score for number of cluster(s) 4: -0.35315719558817327</p>
+<p>Silhouette score for number of cluster(s) 4: 0.7123757225736221</p>
+<p>V-measure score for number of cluster(s) 4: 0.9057460992755191</p>
+<hr>
+<p>Score for number of cluster(s) 5: -0.14940449050401994</p>
+<p>Silhouette score for number of cluster(s) 5: 0.7412646058328913</p>
+<p>V-measure score for number of cluster(s) 5: 1.0</p>
+<hr>
+<p>Score for number of cluster(s) 6: -0.13605003683520822</p>
+<p>Silhouette score for number of cluster(s) 6: 0.6578208285438927</p>
+<p>V-measure score for number of cluster(s) 6: 0.9587362859833009</p>
+<hr>
+<p>Score for number of cluster(s) 7: -0.12306294712884784</p>
+<p>Silhouette score for number of cluster(s) 7: 0.5846038526912967</p>
+<p>V-measure score for number of cluster(s) 7: 0.9189838098179293</p>
+<hr>
+<p>Score for number of cluster(s) 8: -0.11284867732200578</p>
+<p>Silhouette score for number of cluster(s) 8: 0.4874394071207146</p>
+<p>V-measure score for number of cluster(s) 8: 0.8861627146998108</p>
+<hr>
+<p>Score for number of cluster(s) 9: -0.0998405118577923</p>
+<p>Silhouette score for number of cluster(s) 9: 0.428814449735894</p>
+<p>V-measure score for number of cluster(s) 9: 0.854498189131389</p>
+<hr>
+<p>Score for number of cluster(s) 10: -0.0878785962880104</p>
+<p>Silhouette score for number of cluster(s) 10: 0.3384465017487915</p>
+<p>V-measure score for number of cluster(s) 10: 0.8259062168051642</p>
+<hr>
+<p>Score for number of cluster(s) 11: -0.08379149223650498</p>
+<p>Silhouette score for number of cluster(s) 11: 0.3272651857728252</p>
+<p>V-measure score for number of cluster(s) 11: 0.8094516782455371</p>
+<hr>
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=km_scores)
+plt.show()
+</code></pre>
+<img src="output_81_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=vmeasure_score)
+plt.show()
+</code></pre>
+<img src="output_82_0.png" alt="png">
+<h3>K-means fitting with ICA-transformed data</h3>
+<pre><code class="python">
+km_ica = KMeans(n_clusters=5,n_init=10,max_iter=500).fit(X=X_ica)
+preds_km_ica = km_ica.predict(X_ica)
+</code></pre>
+<h3>Visualizing the clusters after running k-means on ICA-transformed features</h3>
+<pre><code class="python">
+col_ica_combi=list(combinations(df_ica.columns,2))
+num_ica_combi = len(col_ica_combi)
+</code></pre>
+<pre><code class="python">
+plt.figure(figsize=(21,20))
+for i in range(1,num_ica_combi+1):
+    plt.subplot(int(num_ica_combi/3)+1,3,i)
+    dim1=col_ica_combi[i-1][0]
+    dim2=col_ica_combi[i-1][1]
+    plt.scatter(df_ica[dim1],df_ica[dim2],c=preds_km_ica,edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+</code></pre>
+<img src="output_87_0.png" alt="png">
+<h2>Random Projection</h2>
+<pre><code class="python">
+from sklearn.random_projection import GaussianRandomProjection
+</code></pre>
+<pre><code class="python">
+n_random_comp = 3
+</code></pre>
+<pre><code class="python">
+random_proj = GaussianRandomProjection(n_components=n_random_comp)
+</code></pre>
+<pre><code class="python">
+X_random_proj = random_proj.fit_transform(X_scaled)
+</code></pre>
+<pre><code class="python">
+df_random_proj=pd.DataFrame(data=X_random_proj,columns=['Random_projection'+str(i) for i in range(1,n_random_comp+1)])
+</code></pre>
+<h3>Running k-means on random projections</h3>
+<pre><code class="python">
+km_scores= []
+km_silhouette = []
+vmeasure_score = []
+for i in range(2,12):
+    km = KMeans(n_clusters=i, random_state=0).fit(X_random_proj)
+    preds = km.predict(X_random_proj)
+    print("Score for number of cluster(s) {}: {}".format(i,km.score(X_random_proj)))
+    km_scores.append(-km.score(X_random_proj))
+    silhouette = silhouette_score(X_random_proj,preds)
+    km_silhouette.append(silhouette)
+    print("Silhouette score for number of cluster(s) {}: {}".format(i,silhouette))
+    v_measure = v_measure_score(y,preds)
+    vmeasure_score.append(v_measure)
+    print("V-measure score for number of cluster(s) {}: {}".format(i,v_measure))
+    print("-"*100)
+</code></pre>
+<p>Score for number of cluster(s) 2: -108.72933492548688</p>
+<p>Silhouette score for number of cluster(s) 2: 0.6150460763079117</p>
+<p>V-measure score for number of cluster(s) 2: 0.589727521756156</p>
+<hr>
+<p>Score for number of cluster(s) 3: -65.28896711446734</p>
+<p>Silhouette score for number of cluster(s) 3: 0.5728431670873194</p>
+<p>V-measure score for number of cluster(s) 3: 0.7918756684685213</p>
+<hr>
+<p>Score for number of cluster(s) 4: -41.42257743853478</p>
+<p>Silhouette score for number of cluster(s) 4: 0.6240342024423224</p>
+<p>V-measure score for number of cluster(s) 4: 0.8881172546211675</p>
+<hr>
+<p>Score for number of cluster(s) 5: -23.538253745624566</p>
+<p>Silhouette score for number of cluster(s) 5: 0.5811199537643463</p>
+<p>V-measure score for number of cluster(s) 5: 0.9314416032602839</p>
+<hr>
+<p>Score for number of cluster(s) 6: -21.264783676295664</p>
+<p>Silhouette score for number of cluster(s) 6: 0.5257514935945146</p>
+<p>V-measure score for number of cluster(s) 6: 0.9100508939391156</p>
+<hr>
+<p>Score for number of cluster(s) 7: -19.023556713322368</p>
+<p>Silhouette score for number of cluster(s) 7: 0.4695645555338544</p>
+<p>V-measure score for number of cluster(s) 7: 0.874473160570811</p>
+<hr>
+<p>Score for number of cluster(s) 8: -16.925317364159135</p>
+<p>Silhouette score for number of cluster(s) 8: 0.41093262965302096</p>
+<p>V-measure score for number of cluster(s) 8: 0.8429663898641941</p>
+<hr>
+<p>Score for number of cluster(s) 9: -15.131602479754328</p>
+<p>Silhouette score for number of cluster(s) 9: 0.3739744237637264</p>
+<p>V-measure score for number of cluster(s) 9: 0.8188920806872699</p>
+<hr>
+<p>Score for number of cluster(s) 10: -13.662472546445393</p>
+<p>Silhouette score for number of cluster(s) 10: 0.3372378029895933</p>
+<p>V-measure score for number of cluster(s) 10: 0.7943547949740137</p>
+<hr>
+<p>Score for number of cluster(s) 11: -13.10225896187362</p>
+<p>Silhouette score for number of cluster(s) 11: 0.32339036378117963</p>
+<p>V-measure score for number of cluster(s) 11: 0.7802621691868225</p>
+<hr>
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=km_scores)
+plt.show()
+</code></pre>
+<img src="output_96_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(2,12)],y=vmeasure_score)
+plt.show()
+</code></pre>
+<img src="output_97_0.png" alt="png">
+<h3>K-means fitting with random-projected data</h3>
+<pre><code class="python">
+km_random_proj = KMeans(n_clusters=5,n_init=10,max_iter=500).fit(X=X_random_proj)
+preds_km_random_proj = km_random_proj.predict(X_random_proj)
+</code></pre>
+<h3>Visualizing the clusters after running k-means on random-projected features</h3>
+<pre><code class="python">
+col_random_proj_combi=list(combinations(df_random_proj.columns,2))
+num_random_proj_combi = len(col_random_proj_combi)
+</code></pre>
+<pre><code class="python">
+plt.figure(figsize=(21,20))
+for i in range(1,num_random_proj_combi+1):
+    plt.subplot(int(num_random_proj_combi/3)+1,3,i)
+    dim1=col_random_proj_combi[i-1][0]
+    dim2=col_random_proj_combi[i-1][1]
+    plt.scatter(df_random_proj[dim1],df_random_proj[dim2],c=preds_km_random_proj,edgecolor='k')
+    plt.xlabel(f"{dim1}",fontsize=13)
+    plt.ylabel(f"{dim2}",fontsize=13)
+plt.show()
+</code></pre>
+<img src="output_102_0.png" alt="png">
+<pre><code class="python">
+def plot_cluster_rp(df_rp,preds_rp):
+    """
+    Plots clusters after running random projection
+    """
+    plt.figure(figsize=(21,12))
+    for i in range(1,num_random_proj_combi+1):
+        plt.subplot(int(num_random_proj_combi/3)+1,3,i)
+        dim1=col_random_proj_combi[i-1][0]
+        dim2=col_random_proj_combi[i-1][1]
+        plt.scatter(df_rp[dim1],df_rp[dim2],c=preds_rp,edgecolor='k')
+        plt.xlabel(f"{dim1}",fontsize=13)
+        plt.ylabel(f"{dim2}",fontsize=13)
+    plt.show()
+</code></pre>
+<h3>Running the random projections many times</h3>
+<pre><code class="python">
+rp_score= []
+rp_silhouette = []
+rp_vmeasure = []
+for i in range(20):
+    random_proj = GaussianRandomProjection(n_components=n_random_comp)
+    X_random_proj = random_proj.fit_transform(X_scaled)
+    df_random_proj=pd.DataFrame(data=X_random_proj,columns=['Random_projection'+str(i) for i in range(1,n_random_comp+1)])
+    
+    km = KMeans(n_clusters=5, random_state=0).fit(X_random_proj)
+    preds = km.predict(X_random_proj)
+    print("Score for iteration {}: {}".format(i,km.score(X_random_proj)))
+    rp_score.append(-km.score(X_random_proj))
+    
+    silhouette = silhouette_score(X_random_proj,preds)
+    rp_silhouette.append(silhouette)
+    print("Silhouette score for iteration {}: {}".format(i,silhouette))
+    
+    v_measure = v_measure_score(y,preds)
+    rp_vmeasure.append(v_measure)
+    print("V-measure score for iteration {}: {}".format(i,v_measure))
+    print("-"*100)
+    
+    plot_cluster_rp(df_random_proj,preds)
+</code></pre>
+<p>Score for iteration 0: -51.804005150954964</p>
+<p>Silhouette score for iteration 0: 0.4225296646215942</p>
+<p>V-measure score for iteration 0: 0.7589350467978031</p>
+<hr>
+<img src="output_105_1.png" alt="png">
+<p>Score for iteration 1: -19.27484189021586</p>
+<p>Silhouette score for iteration 1: 0.43882062341863026</p>
+<p>V-measure score for iteration 1: 0.8320399528133794</p>
+<hr>
+<img src="output_105_3.png" alt="png">
+<p>Score for iteration 2: -35.8236740296624</p>
+<p>Silhouette score for iteration 2: 0.5222556186785831</p>
+<p>V-measure score for iteration 2: 0.8342125126216047</p>
+<hr>
+<img src="output_105_5.png" alt="png">
+<p>Score for iteration 3: -27.794179551961257</p>
+<p>Silhouette score for iteration 3: 0.5928573194014382</p>
+<p>V-measure score for iteration 3: 0.9062210893973692</p>
+<hr>
+<img src="output_105_7.png" alt="png">
+<p>Score for iteration 4: -44.03586921205549</p>
+<p>Silhouette score for iteration 4: 0.6346276673099741</p>
+<p>V-measure score for iteration 4: 0.9813038496497519</p>
+<hr>
+<img src="output_105_9.png" alt="png">
+<p>Score for iteration 5: -19.888481510925782</p>
+<p>Silhouette score for iteration 5: 0.3905716399767413</p>
+<p>V-measure score for iteration 5: 0.732339161768628</p>
+<hr>
+<img src="output_105_11.png" alt="png">
+<p>Score for iteration 6: -13.795428151165442</p>
+<p>Silhouette score for iteration 6: 0.5778639908559473</p>
+<p>V-measure score for iteration 6: 0.9039506162150731</p>
+<hr>
+<img src="output_105_13.png" alt="png">
+<p>Score for iteration 7: -42.38948891338657</p>
+<p>Silhouette score for iteration 7: 0.5628838204973815</p>
+<p>V-measure score for iteration 7: 0.9930346013311964</p>
+<hr>
+<img src="output_105_15.png" alt="png">
+<p>Score for iteration 8: -52.80054799361462</p>
+<p>Silhouette score for iteration 8: 0.3657287720200757</p>
+<p>V-measure score for iteration 8: 0.7405886755951101</p>
+<hr>
+<img src="output_105_17.png" alt="png">
+<p>Score for iteration 9: -23.020320345020057</p>
+<p>Silhouette score for iteration 9: 0.5930489815079502</p>
+<p>V-measure score for iteration 9: 0.9499458736045409</p>
+<hr>
+<img src="output_105_19.png" alt="png">
+<p>Score for iteration 10: -33.00770974742527</p>
+<p>Silhouette score for iteration 10: 0.44681997034310433</p>
+<p>V-measure score for iteration 10: 0.8291450853472282</p>
+<hr>
+<img src="output_105_21.png" alt="png">
+<p>Score for iteration 11: -50.56139916544864</p>
+<p>Silhouette score for iteration 11: 0.501079881530276</p>
+<p>V-measure score for iteration 11: 0.8438490920227738</p>
+<hr>
+<img src="output_105_23.png" alt="png">
+<p>Score for iteration 12: -28.466196416161296</p>
+<p>Silhouette score for iteration 12: 0.42872112340515506</p>
+<p>V-measure score for iteration 12: 0.8051610327945621</p>
+<hr>
+<img src="output_105_25.png" alt="png">
+<p>Score for iteration 13: -32.841403530417814</p>
+<p>Silhouette score for iteration 13: 0.6960491338864279</p>
+<p>V-measure score for iteration 13: 0.9960866319013288</p>
+<hr>
+<img src="output_105_27.png" alt="png">
+<p>Score for iteration 14: -30.87103181156933</p>
+<p>Silhouette score for iteration 14: 0.434427047679983</p>
+<p>V-measure score for iteration 14: 0.8612695873717946</p>
+<hr>
+<img src="output_105_29.png" alt="png">
+<p>Score for iteration 15: -19.31818917264638</p>
+<p>Silhouette score for iteration 15: 0.5136509361539758</p>
+<p>V-measure score for iteration 15: 0.866827839809779</p>
+<hr>
+<img src="output_105_31.png" alt="png">
+<p>Score for iteration 16: -32.71470545328701</p>
+<p>Silhouette score for iteration 16: 0.5230565747628154</p>
+<p>V-measure score for iteration 16: 0.8384172044661217</p>
+<hr>
+<img src="output_105_33.png" alt="png">
+<p>Score for iteration 17: -42.95181419949162</p>
+<p>Silhouette score for iteration 17: 0.5245561795007441</p>
+<p>V-measure score for iteration 17: 0.796263739407199</p>
+<hr>
+<img src="output_105_35.png" alt="png">
+<p>Score for iteration 18: -26.72674291232747</p>
+<p>Silhouette score for iteration 18: 0.6127901865685303</p>
+<p>V-measure score for iteration 18: 0.979434971250246</p>
+<hr>
+<img src="output_105_37.png" alt="png">
+<p>Score for iteration 19: -36.811682633414335</p>
+<p>Silhouette score for iteration 19: 0.4626802270366495</p>
+<p>V-measure score for iteration 19: 0.8526210061406365</p>
+<hr>
+<img src="output_105_39.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(20)],y=rp_score)
+plt.show()
+</code></pre>
+<img src="output_106_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(20)],y=rp_silhouette)
+plt.show()
+</code></pre>
+<img src="output_107_0.png" alt="png">
+<pre><code class="python">
+plt.scatter(x=[i for i in range(20)],y=rp_vmeasure)
+plt.show()
+</code></pre>
+<img src="output_108_0.png" alt="png">
+<h3>This kind of variation does not happen with PCA</h3>
+<pre><code class="python">
+pca_score= []
+pca_silhouette = []
+pca_vmeasure = []
+for i in range(20):
+    pca_partial = PCA(n_components=n_prin_comp,svd_solver='full')
+    X_pca=pca_partial.fit_transform(X_scaled)
+    km = KMeans(n_clusters=5, random_state=0).fit(X_pca)
+    preds = km.predict(X_pca)
+    print("Score for iteration {}: {}".format(i,km.score(X_pca)))
+    rp_score.append(-km.score(X_pca))
+    silhouette = silhouette_score(X_pca,preds)
+    rp_silhouette.append(silhouette)
+    print("Silhouette score for iteration {}: {}".format(i,silhouette))
+    v_measure = v_measure_score(y,preds)
+    rp_vmeasure.append(v_measure)
+    print("V-measure score for iteration {}: {}".format(i,v_measure))
+    print("-"*100)
+</code></pre>
+<p>Score for iteration 0: -13.337906664224475</p>
+<p>Silhouette score for iteration 0: 0.7539386544728407</p>
+<p>V-measure score for iteration 0: 1.0</p>
+<hr>
+<p>Score for iteration 1: -13.337906664224475</p>
+<p>Silhouette score for iteration 1: 0.7539386544728407</p>
+<p>V-measure score for iteration 1: 1.0</p>
+<hr>
+<p>Score for iteration 2: -13.337906664224475</p>
+<p>Silhouette score for iteration 2: 0.7539386544728407</p>
+<p>V-measure score for iteration 2: 1.0</p>
+<hr>
+<p>Score for iteration 3: -13.337906664224475</p>
+<p>Silhouette score for iteration 3: 0.7539386544728407</p>
+<p>V-measure score for iteration 3: 1.0</p>
+<hr>
+<p>Score for iteration 4: -13.337906664224475</p>
+<p>Silhouette score for iteration 4: 0.7539386544728407</p>
+<p>V-measure score for iteration 4: 1.0</p>
+<hr>
+<p>Score for iteration 5: -13.337906664224475</p>
+<p>Silhouette score for iteration 5: 0.7539386544728407</p>
+<p>V-measure score for iteration 5: 1.0</p>
+<hr>
+<p>Score for iteration 6: -13.337906664224475</p>
+<p>Silhouette score for iteration 6: 0.7539386544728407</p>
+<p>V-measure score for iteration 6: 1.0</p>
+<hr>
+<p>Score for iteration 7: -13.337906664224475</p>
+<p>Silhouette score for iteration 7: 0.7539386544728407</p>
+<p>V-measure score for iteration 7: 1.0</p>
+<hr>
+<p>Score for iteration 8: -13.337906664224475</p>
+<p>Silhouette score for iteration 8: 0.7539386544728407</p>
+<p>V-measure score for iteration 8: 1.0</p>
+<hr>
+<p>Score for iteration 9: -13.337906664224475</p>
+<p>Silhouette score for iteration 9: 0.7539386544728407</p>
+<p>V-measure score for iteration 9: 1.0</p>
+<hr>
+<p>Score for iteration 10: -13.337906664224475</p>
+<p>Silhouette score for iteration 10: 0.7539386544728407</p>
+<p>V-measure score for iteration 10: 1.0</p>
+<hr>
+<p>Score for iteration 11: -13.337906664224475</p>
+<p>Silhouette score for iteration 11: 0.7539386544728407</p>
+<p>V-measure score for iteration 11: 1.0</p>
+<hr>
+<p>Score for iteration 12: -13.337906664224475</p>
+<p>Silhouette score for iteration 12: 0.7539386544728407</p>
+<p>V-measure score for iteration 12: 1.0</p>
+<hr>
+<p>Score for iteration 13: -13.337906664224475</p>
+<p>Silhouette score for iteration 13: 0.7539386544728407</p>
+<p>V-measure score for iteration 13: 1.0</p>
+<hr>
+<p>Score for iteration 14: -13.337906664224475</p>
+<p>Silhouette score for iteration 14: 0.7539386544728407</p>
+<p>V-measure score for iteration 14: 1.0</p>
+<hr>
+<p>Score for iteration 15: -13.337906664224475</p>
+<p>Silhouette score for iteration 15: 0.7539386544728407</p>
+<p>V-measure score for iteration 15: 1.0</p>
+<hr>
+<p>Score for iteration 16: -13.337906664224475</p>
+<p>Silhouette score for iteration 16: 0.7539386544728407</p>
+<p>V-measure score for iteration 16: 1.0</p>
+<hr>
+<p>Score for iteration 17: -13.337906664224475</p>
+<p>Silhouette score for iteration 17: 0.7539386544728407</p>
+<p>V-measure score for iteration 17: 1.0</p>
+<hr>
+<p>Score for iteration 18: -13.337906664224475</p>
+<p>Silhouette score for iteration 18: 0.7539386544728407</p>
+<p>V-measure score for iteration 18: 1.0</p>
+<hr>
+<p>Score for iteration 19: -13.337906664224475</p>
+<p>Silhouette score for iteration 19: 0.7539386544728407</p>
+<p>V-measure score for iteration 19: 1.0</p>
+<hr>
+    </div>
+    <div class="article-footer">
+        <p>原文链接: <a href="" target="_blank" rel="noopener"></a></p>
+        <p>原作者: Unknown | 许可证: BSD-2-CLAUSE</p>
+        <p style="margin-top:10px;">&copy; 2026 Anti-AI · 如需下架请联系: 247056714@qq.com</p>
+    </div>
+</body>
+</html>
