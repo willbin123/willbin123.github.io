@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Augmentation   Article Shoot - Data-Science-Hacks | Anti-AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.7; }
+        .nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 15px 20px; position: sticky; top: 0; z-index: 100; }
+        .nav a { color: #58a6ff; text-decoration: none; font-size: 1.1em; }
+        .article-header { max-width: 800px; margin: 0 auto; padding: 40px 20px 20px; border-bottom: 1px solid #30363d; }
+        .article-header h1 { font-size: 2em; color: #e6edf3; margin-bottom: 15px; }
+        .article-meta { color: #8b949e; font-size: 0.9em; display: flex; gap: 20px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-body { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+        .article-body h1, .article-body h2, .article-body h3 { color: #e6edf3; margin: 25px 0 12px; }
+        .article-body h2 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .article-body p { margin: 12px 0; }
+        .article-body a { color: #58a6ff; }
+        .article-body code { background: #1c2128; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 0.9em; color: #f0883e; }
+        .article-body pre { background: #1c2128; padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid #30363d; margin: 15px 0; }
+        .article-body pre code { background: none; padding: 0; color: #c9d1d9; }
+        .article-body img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+        .article-body blockquote { border-left: 3px solid #58a6ff; padding-left: 15px; margin: 15px 0; color: #8b949e; }
+        .article-body ul, .article-body ol { padding-left: 25px; margin: 12px 0; }
+        .article-footer { max-width: 800px; margin: 0 auto; padding: 20px; border-top: 1px solid #30363d; color: #8b949e; font-size: 0.85em; }
+        .article-footer a { color: #58a6ff; }
+        .disclaimer { background: rgba(136, 136, 136, 0.1); border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.85em; color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="/">&larr; 返回首页</a></div>
+    <div class="article-header">
+        <h1>Image Augmentation   Article Shoot - Data-Science-Hacks</h1>
+        <div class="article-meta">
+            <span>&#128197; 2026-08-05</span>
+            <span>&#128100; Unknown</span>
+            <span class="tag">GPL-3.0</span>
+            
+        </div>
+    </div>
+    <div class="article-body">
+        <div class="disclaimer"><p><strong>&#9888; 转载声明</strong></p><p>本文转载自 GitHub 开源项目，原作者: <strong>Unknown</strong></p><p>原文地址: <a href="" target="_blank" rel="noopener"></a></p><p>许可证: GPL-3.0</p></div>
+        <blockquote><strong>转载声明</strong> | 本文转载自 GitHub 开源项目 <a href="https://github.com/kunalj101/Data-Science-Hacks" target="_blank" rel="noopener">kunalj101/Data-Science-Hacks</a></blockquote>
+<blockquote>原作者: <strong>kunalj101</strong> | 文件: <code>Code/Image Augmentation - Article Shoot.ipynb</code></blockquote>
+<blockquote>许可证: GPL-3.0 | Stars: ★432</blockquote>
+<blockquote>项目描述: Data Science Hacks consists of tips, tricks to help you become a better data scientist. Data science hacks are for all - beginner to advanced. Data science hacks consist of python, jupyter notebook, pandas hacks and so on.</blockquote>
+<p>---</p>
+<pre><code>
+# importing all the required libraries
+import skimage.io as io
+from skimage.transform import rotate
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+</code></pre>
+<pre><code>
+# reading the image using its path
+image = io.imread('image.jpg')
+</code></pre>
+<pre><code>
+def image_augment(image):
+    fig,ax = plt.subplots(nrows=1,ncols=3,figsize=(20,10))
+    ax[0].imshow(image)
+    ax[0].axis('off')
+    ax[1].imshow(rotate(image, angle=45, mode = 'wrap'))
+    ax[1].axis('off')
+    ax[2].imshow(np.fliplr(image))
+    ax[2].axis('off')
+    
+image_augment(image)
+</code></pre>
+<img src="output_2_0.png" alt="png">
+<pre><code>
+
+</code></pre>
+    </div>
+    <div class="article-footer">
+        <p>原文链接: <a href="" target="_blank" rel="noopener"></a></p>
+        <p>原作者: Unknown | 许可证: GPL-3.0</p>
+        <p style="margin-top:10px;">&copy; 2026 Anti-AI</p>
+    </div>
+</body>
+</html>
