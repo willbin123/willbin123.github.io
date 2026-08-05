@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual analytics and diagnostics of model fit for linear regression | Anti-AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0d1117; color: #c9d1d9; line-height: 1.7;
+        }
+        .nav {
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 15px 20px; position: sticky; top: 0; z-index: 100;
+        }
+        .nav a { color: #58a6ff; text-decoration: none; font-size: 1.1em; }
+        .nav a:hover { text-decoration: underline; }
+        .article-header {
+            max-width: 800px; margin: 0 auto; padding: 40px 20px 20px;
+            border-bottom: 1px solid #30363d;
+        }
+        .article-header h1 { font-size: 2em; color: #e6edf3; margin-bottom: 15px; }
+        .article-meta { color: #8b949e; font-size: 0.9em; display: flex; gap: 20px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-body {
+            max-width: 800px; margin: 0 auto; padding: 30px 20px;
+        }
+        .article-body h1, .article-body h2, .article-body h3 { color: #e6edf3; margin: 25px 0 12px; }
+        .article-body h1 { font-size: 1.6em; }
+        .article-body h2 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .article-body h3 { font-size: 1.2em; }
+        .article-body p { margin: 12px 0; }
+        .article-body a { color: #58a6ff; }
+        .article-body code {
+            background: #1c2128; padding: 2px 6px; border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; color: #f0883e;
+        }
+        .article-body pre {
+            background: #1c2128; padding: 16px; border-radius: 8px; overflow-x: auto;
+            border: 1px solid #30363d; margin: 15px 0;
+        }
+        .article-body pre code { background: none; padding: 0; color: #c9d1d9; }
+        .article-body img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+        .article-body blockquote {
+            border-left: 3px solid #58a6ff; padding-left: 15px; margin: 15px 0;
+            color: #8b949e;
+        }
+        .article-body ul, .article-body ol { padding-left: 25px; margin: 12px 0; }
+        .article-body li { margin: 6px 0; }
+        .article-body table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        .article-body th, .article-body td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .article-body th { background: #161b22; }
+        .article-footer {
+            max-width: 800px; margin: 0 auto; padding: 20px;
+            border-top: 1px solid #30363d; color: #8b949e; font-size: 0.85em;
+        }
+        .article-footer a { color: #58a6ff; }
+        .disclaimer {
+            background: rgba(136, 136, 136, 0.1); border: 1px solid #30363d;
+            border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.85em; color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="/">&larr; 返回首页</a></div>
+    <div class="article-header">
+        <h1>Visual analytics and diagnostics of model fit for linear regression</h1>
+        <div class="article-meta">
+            <span>&#128197; 2026-08-05</span>
+            <span>&#128100; Unknown</span>
+            <span class="tag">BSD-2-CLAUSE</span>
+            
+        </div>
+    </div>
+    <div class="article-body">
+        
+                <div class="disclaimer">
+                    <p><strong>&#9888; 转载声明</strong></p>
+                    <p>本文转载自 GitHub 开源项目，原作者: <strong>Unknown</strong></p>
+                    <p>原文地址: <a href="" target="_blank" rel="noopener"></a></p>
+                    <p>许可证: BSD-2-CLAUSE</p>
+                </div>
+            
+        <blockquote><strong>转载声明</strong> | 本文转载自 GitHub 开源项目 <a href="https://github.com/tirthajyoti/Machine-Learning-with-Python" target="_blank" rel="noopener">tirthajyoti/Machine-Learning-with-Python</a></blockquote>
+<blockquote>原作者: <strong>tirthajyoti</strong> | 文件: <code>Regression/Regression_Diagnostics.ipynb</code></blockquote>
+<blockquote>许可证: BSD-2-CLAUSE | Stars: ★3322</blockquote>
+<blockquote>项目描述: Practice and tutorial-style notebooks  covering wide variety of machine learning techniques</blockquote>
+<hr>
+<h1>Visual analytics and diagnostics of model fit for linear regression</h1>
+<h3>Dr. Tirthajyoti Sarkar</h3>
+<h3>Fremont, CA 94536, June 2019</h3>
+<p>In this notebook, we show the basic visual analytics and diagnostic tests that should be run after fitting a linear regression model, for <strong>checking the goodness of fit by verifying the fundamental assumptions of linear regression</strong> - <em>linearity, independence, constant variance,</em> and <em>normality</em>. In particular, following analytics are shown,</p>
+<ul>
+<li>Pairwise scatterplot of the data matrix</li>
+<li>Correlation matrix and heatmap</li>
+<li>Creating a new dataset of predicting features and their statistical significance (based on p-values)</li>
+<li>Residuals vs. predicting variables plots</li>
+<li>Fitted vs. residuals plot</li>
+<li>Histogram of the normalized residuals</li>
+<li>Q-Q plot of the normalized residuals</li>
+<li>Shapiro-Wilk normality test on the residuals</li>
+<li>Cook's distance plot of the residuals</li>
+<li>Variance inflation factor (VIF) of the predicting features</li>
+</ul>
+<h3>Requirements</h3>
+<ul>
+<li>Python 3.6+</li>
+<li><code>Numpy</code></li>
+<li><code>Pandas</code></li>
+<li><code>Seaborn</code></li>
+<li><code>Statsmodels</code></li>
+<li><code>Scipy</code></li>
+</ul>
+<h3>The dataset</h3>
+<p>We analyze the <strong><a href="https://archive.ics.uci.edu/ml/datasets/Concrete+Compressive+Strength" target="_blank" rel="noopener">Concrete Compressive Strength Data Set</a></strong> from UCI ML repository in this notebook.</p>
+<p><em><strong>Abstract</strong></em>: Concrete is the most important material in civil engineering. The concrete compressive strength is a highly nonlinear function of age and ingredients. Can we predict the strength from other measurement values?</p>
+<p>#### Data Set Information:</p>
+<ul>
+<li>Number of instances: 1030</li>
+<li>Number of Attributes: 9</li>
+<li>Attribute breakdown	8 quantitative input variables, and 1 quantitative output variable</li>
+<li>Missing Attribute Values: None</li>
+</ul>
+<h3>Import the libraries and read the data in</h3>
+<pre><code class="python">
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as sm
+</code></pre>
+<pre><code class="python">
+# The dataset path may be different in your situation. Please use the correct path
+df = pd.read_excel("Datasets/Concrete_Data.xls")
+</code></pre>
+<pre><code class="python">
+df.head(10)
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>Cement (component 1)(kg in a m^3 mixture)</th></p>
+<p><th>Blast Furnace Slag (component 2)(kg in a m^3 mixture)</th></p>
+<p><th>Fly Ash (component 3)(kg in a m^3 mixture)</th></p>
+<p><th>Water  (component 4)(kg in a m^3 mixture)</th></p>
+<p><th>Superplasticizer (component 5)(kg in a m^3 mixture)</th></p>
+<p><th>Coarse Aggregate  (component 6)(kg in a m^3 mixture)</th></p>
+<p><th>Fine Aggregate (component 7)(kg in a m^3 mixture)</th></p>
+<p><th>Age (day)</th></p>
+<p><th>Concrete compressive strength(MPa, megapascals)</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>0</th></p>
+<p><td>540.0</td></p>
+<p><td>0.0</td></p>
+<p><td>0.0</td></p>
+<p><td>162.0</td></p>
+<p><td>2.5</td></p>
+<p><td>1040.0</td></p>
+<p><td>676.0</td></p>
+<p><td>28</td></p>
+<p><td>79.986111</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>1</th></p>
+<p><td>540.0</td></p>
+<p><td>0.0</td></p>
+<p><td>0.0</td></p>
+<p><td>162.0</td></p>
+<p><td>2.5</td></p>
+<p><td>1055.0</td></p>
+<p><td>676.0</td></p>
+<p><td>28</td></p>
+<p><td>61.887366</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>2</th></p>
+<p><td>332.5</td></p>
+<p><td>142.5</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>270</td></p>
+<p><td>40.269535</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>3</th></p>
+<p><td>332.5</td></p>
+<p><td>142.5</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>365</td></p>
+<p><td>41.052780</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>4</th></p>
+<p><td>198.6</td></p>
+<p><td>132.4</td></p>
+<p><td>0.0</td></p>
+<p><td>192.0</td></p>
+<p><td>0.0</td></p>
+<p><td>978.4</td></p>
+<p><td>825.5</td></p>
+<p><td>360</td></p>
+<p><td>44.296075</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>5</th></p>
+<p><td>266.0</td></p>
+<p><td>114.0</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>670.0</td></p>
+<p><td>90</td></p>
+<p><td>47.029847</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>6</th></p>
+<p><td>380.0</td></p>
+<p><td>95.0</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>365</td></p>
+<p><td>43.698299</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>7</th></p>
+<p><td>380.0</td></p>
+<p><td>95.0</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>28</td></p>
+<p><td>36.447770</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>8</th></p>
+<p><td>266.0</td></p>
+<p><td>114.0</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>670.0</td></p>
+<p><td>28</td></p>
+<p><td>45.854291</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>9</th></p>
+<p><td>475.0</td></p>
+<p><td>0.0</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>28</td></p>
+<p><td>39.289790</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<pre><code class="python">
+df.describe().T
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>count</th></p>
+<p><th>mean</th></p>
+<p><th>std</th></p>
+<p><th>min</th></p>
+<p><th>25%</th></p>
+<p><th>50%</th></p>
+<p><th>75%</th></p>
+<p><th>max</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>Cement (component 1)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>281.165631</td></p>
+<p><td>104.507142</td></p>
+<p><td>102.000000</td></p>
+<p><td>192.375000</td></p>
+<p><td>272.900000</td></p>
+<p><td>350.000000</td></p>
+<p><td>540.000000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Blast Furnace Slag (component 2)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>73.895485</td></p>
+<p><td>86.279104</td></p>
+<p><td>0.000000</td></p>
+<p><td>0.000000</td></p>
+<p><td>22.000000</td></p>
+<p><td>142.950000</td></p>
+<p><td>359.400000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Fly Ash (component 3)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>54.187136</td></p>
+<p><td>63.996469</td></p>
+<p><td>0.000000</td></p>
+<p><td>0.000000</td></p>
+<p><td>0.000000</td></p>
+<p><td>118.270000</td></p>
+<p><td>200.100000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Water  (component 4)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>181.566359</td></p>
+<p><td>21.355567</td></p>
+<p><td>121.750000</td></p>
+<p><td>164.900000</td></p>
+<p><td>185.000000</td></p>
+<p><td>192.000000</td></p>
+<p><td>247.000000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Superplasticizer (component 5)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>6.203112</td></p>
+<p><td>5.973492</td></p>
+<p><td>0.000000</td></p>
+<p><td>0.000000</td></p>
+<p><td>6.350000</td></p>
+<p><td>10.160000</td></p>
+<p><td>32.200000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Coarse Aggregate  (component 6)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>972.918592</td></p>
+<p><td>77.753818</td></p>
+<p><td>801.000000</td></p>
+<p><td>932.000000</td></p>
+<p><td>968.000000</td></p>
+<p><td>1029.400000</td></p>
+<p><td>1145.000000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Fine Aggregate (component 7)(kg in a m^3 mixture)</th></p>
+<p><td>1030.0</td></p>
+<p><td>773.578883</td></p>
+<p><td>80.175427</td></p>
+<p><td>594.000000</td></p>
+<p><td>730.950000</td></p>
+<p><td>779.510000</td></p>
+<p><td>824.000000</td></p>
+<p><td>992.600000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Age (day)</th></p>
+<p><td>1030.0</td></p>
+<p><td>45.662136</td></p>
+<p><td>63.169912</td></p>
+<p><td>1.000000</td></p>
+<p><td>7.000000</td></p>
+<p><td>28.000000</td></p>
+<p><td>56.000000</td></p>
+<p><td>365.000000</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Concrete compressive strength(MPa, megapascals)</th></p>
+<p><td>1030.0</td></p>
+<p><td>35.817836</td></p>
+<p><td>16.705679</td></p>
+<p><td>2.331808</td></p>
+<p><td>23.707115</td></p>
+<p><td>34.442774</td></p>
+<p><td>46.136287</td></p>
+<p><td>82.599225</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<h3>Taking a peek at the relationship between the predicting variables and the response</h3>
+<pre><code class="python">
+for c in df.columns[:-1]:
+    plt.figure(figsize=(8,5))
+    plt.title("{} vs. \nConcrete Compressive Strength".format(c),fontsize=16)
+    plt.scatter(x=df[c],y=df['Concrete compressive strength(MPa, megapascals) '],color='blue',edgecolor='k')
+    plt.grid(True)
+    plt.xlabel(c,fontsize=14)
+    plt.ylabel('Concrete compressive strength\n(MPa, megapascals)',fontsize=14)
+    plt.show()
+</code></pre>
+<img src="output_9_0.png" alt="png">
+<img src="output_9_1.png" alt="png">
+<img src="output_9_2.png" alt="png">
+<img src="output_9_3.png" alt="png">
+<img src="output_9_4.png" alt="png">
+<img src="output_9_5.png" alt="png">
+<img src="output_9_6.png" alt="png">
+<img src="output_9_7.png" alt="png">
+<h3>Creating a copy with suitable column names for processing with <code>statsmodels.OLS()</code></h3>
+<pre><code class="python">
+df1 = df.copy()
+</code></pre>
+<pre><code class="python">
+df1.columns=['Component'+str(i) for i in range(1,8)]+['Age']+['y']
+</code></pre>
+<pre><code class="python">
+df1.head()
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>Component1</th></p>
+<p><th>Component2</th></p>
+<p><th>Component3</th></p>
+<p><th>Component4</th></p>
+<p><th>Component5</th></p>
+<p><th>Component6</th></p>
+<p><th>Component7</th></p>
+<p><th>Age</th></p>
+<p><th>y</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>0</th></p>
+<p><td>540.0</td></p>
+<p><td>0.0</td></p>
+<p><td>0.0</td></p>
+<p><td>162.0</td></p>
+<p><td>2.5</td></p>
+<p><td>1040.0</td></p>
+<p><td>676.0</td></p>
+<p><td>28</td></p>
+<p><td>79.986111</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>1</th></p>
+<p><td>540.0</td></p>
+<p><td>0.0</td></p>
+<p><td>0.0</td></p>
+<p><td>162.0</td></p>
+<p><td>2.5</td></p>
+<p><td>1055.0</td></p>
+<p><td>676.0</td></p>
+<p><td>28</td></p>
+<p><td>61.887366</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>2</th></p>
+<p><td>332.5</td></p>
+<p><td>142.5</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>270</td></p>
+<p><td>40.269535</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>3</th></p>
+<p><td>332.5</td></p>
+<p><td>142.5</td></p>
+<p><td>0.0</td></p>
+<p><td>228.0</td></p>
+<p><td>0.0</td></p>
+<p><td>932.0</td></p>
+<p><td>594.0</td></p>
+<p><td>365</td></p>
+<p><td>41.052780</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>4</th></p>
+<p><td>198.6</td></p>
+<p><td>132.4</td></p>
+<p><td>0.0</td></p>
+<p><td>192.0</td></p>
+<p><td>0.0</td></p>
+<p><td>978.4</td></p>
+<p><td>825.5</td></p>
+<p><td>360</td></p>
+<p><td>44.296075</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<h3>Pairwise scatter plots</h3>
+<pre><code class="python">
+from seaborn import pairplot
+</code></pre>
+<pre><code class="python">
+pairplot(df1)
+</code></pre>
+<p><seaborn.axisgrid.PairGrid at 0x1e4cfeaf400></p>
+<img src="output_16_1.png" alt="png">
+<h3>Correlation matrix and heatmap to visually check for <a href="https://en.wikipedia.org/wiki/Multicollinearity" target="_blank" rel="noopener">multicollinearity</a></h3>
+<pre><code class="python">
+corr = df1[:-1].corr()
+</code></pre>
+<pre><code class="python">
+corr
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>Component1</th></p>
+<p><th>Component2</th></p>
+<p><th>Component3</th></p>
+<p><th>Component4</th></p>
+<p><th>Component5</th></p>
+<p><th>Component6</th></p>
+<p><th>Component7</th></p>
+<p><th>Age</th></p>
+<p><th>y</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>Component1</th></p>
+<p><td>1.000000</td></p>
+<p><td>-0.275153</td></p>
+<p><td>-0.397439</td></p>
+<p><td>-0.081408</td></p>
+<p><td>0.092856</td></p>
+<p><td>-0.109725</td></p>
+<p><td>-0.222755</td></p>
+<p><td>0.081899</td></p>
+<p><td>0.497813</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component2</th></p>
+<p><td>-0.275153</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.323720</td></p>
+<p><td>0.107065</td></p>
+<p><td>0.043261</td></p>
+<p><td>-0.283862</td></p>
+<p><td>-0.281564</td></p>
+<p><td>-0.044166</td></p>
+<p><td>0.134895</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component3</th></p>
+<p><td>-0.397439</td></p>
+<p><td>-0.323720</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.257488</td></p>
+<p><td>0.377248</td></p>
+<p><td>-0.009475</td></p>
+<p><td>0.079138</td></p>
+<p><td>-0.154284</td></p>
+<p><td>-0.105688</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component4</th></p>
+<p><td>-0.081408</td></p>
+<p><td>0.107065</td></p>
+<p><td>-0.257488</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.658118</td></p>
+<p><td>-0.181344</td></p>
+<p><td>-0.450683</td></p>
+<p><td>0.277965</td></p>
+<p><td>-0.289554</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component5</th></p>
+<p><td>0.092856</td></p>
+<p><td>0.043261</td></p>
+<p><td>0.377248</td></p>
+<p><td>-0.658118</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.266031</td></p>
+<p><td>0.222580</td></p>
+<p><td>-0.192630</td></p>
+<p><td>0.366218</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component6</th></p>
+<p><td>-0.109725</td></p>
+<p><td>-0.283862</td></p>
+<p><td>-0.009475</td></p>
+<p><td>-0.181344</td></p>
+<p><td>-0.266031</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.178881</td></p>
+<p><td>-0.003398</td></p>
+<p><td>-0.165365</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Component7</th></p>
+<p><td>-0.222755</td></p>
+<p><td>-0.281564</td></p>
+<p><td>0.079138</td></p>
+<p><td>-0.450683</td></p>
+<p><td>0.222580</td></p>
+<p><td>-0.178881</td></p>
+<p><td>1.000000</td></p>
+<p><td>-0.156143</td></p>
+<p><td>-0.167284</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Age</th></p>
+<p><td>0.081899</td></p>
+<p><td>-0.044166</td></p>
+<p><td>-0.154284</td></p>
+<p><td>0.277965</td></p>
+<p><td>-0.192630</td></p>
+<p><td>-0.003398</td></p>
+<p><td>-0.156143</td></p>
+<p><td>1.000000</td></p>
+<p><td>0.328841</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>y</th></p>
+<p><td>0.497813</td></p>
+<p><td>0.134895</td></p>
+<p><td>-0.105688</td></p>
+<p><td>-0.289554</td></p>
+<p><td>0.366218</td></p>
+<p><td>-0.165365</td></p>
+<p><td>-0.167284</td></p>
+<p><td>0.328841</td></p>
+<p><td>1.000000</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<pre><code class="python">
+from statsmodels.graphics.correlation import plot_corr
+</code></pre>
+<pre><code class="python">
+fig=plot_corr(corr,xnames=corr.columns)
+</code></pre>
+<img src="output_21_0.png" alt="png">
+<h3>Creating a formula string for using in the <code>statsmodels.OLS()</code></h3>
+<pre><code class="python">
+formula_str = df1.columns[-1]+' ~ '+'+'.join(df1.columns[:-1])
+</code></pre>
+<pre><code class="python">
+formula_str
+</code></pre>
+<p>'y ~ Component1+Component2+Component3+Component4+Component5+Component6+Component7+Age'</p>
+<h3>Construct and fit the model. Print summary of the fitted model</h3>
+<pre><code class="python">
+model=sm.ols(formula=formula_str, data=df1)
+</code></pre>
+<pre><code class="python">
+fitted = model.fit()
+</code></pre>
+<pre><code class="python">
+print(fitted.summary())
+</code></pre>
+<p>OLS Regression Results</p>
+<p>==============================================================================</p>
+<p>Dep. Variable:                      y   R-squared:                       0.615</p>
+<p>Model:                            OLS   Adj. R-squared:                  0.612</p>
+<p>Method:                 Least Squares   F-statistic:                     204.3</p>
+<p>Date:                Mon, 03 Jun 2019   Prob (F-statistic):          6.76e-206</p>
+<p>Time:                        22:53:37   Log-Likelihood:                -3869.0</p>
+<p>No. Observations:                1030   AIC:                             7756.</p>
+<p>Df Residuals:                    1021   BIC:                             7800.</p>
+<p>Df Model:                           8</p>
+<p>Covariance Type:            nonrobust</p>
+<p>==============================================================================</p>
+<p>coef    std err          t      P>|t|      [0.025      0.975]</p>
+<hr>
+<p>Intercept    -23.1638     26.588     -0.871      0.384     -75.338      29.010</p>
+<p>Component1     0.1198      0.008     14.110      0.000       0.103       0.136</p>
+<p>Component2     0.1038      0.010     10.245      0.000       0.084       0.124</p>
+<p>Component3     0.0879      0.013      6.988      0.000       0.063       0.113</p>
+<p>Component4    -0.1503      0.040     -3.741      0.000      -0.229      -0.071</p>
+<p>Component5     0.2907      0.093      3.110      0.002       0.107       0.474</p>
+<p>Component6     0.0180      0.009      1.919      0.055      -0.000       0.036</p>
+<p>Component7     0.0202      0.011      1.883      0.060      -0.001       0.041</p>
+<p>Age            0.1142      0.005     21.046      0.000       0.104       0.125</p>
+<p>==============================================================================</p>
+<p>Omnibus:                        5.379   Durbin-Watson:                   1.281</p>
+<p>Prob(Omnibus):                  0.068   Jarque-Bera (JB):                5.305</p>
+<p>Skew:                          -0.174   Prob(JB):                       0.0705</p>
+<p>Kurtosis:                       3.045   Cond. No.                     1.06e+05</p>
+<p>==============================================================================</p>
+<p>Warnings:</p>
+<p>[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</p>
+<p>[2] The condition number is large, 1.06e+05. This might indicate that there are</p>
+<p>strong multicollinearity or other numerical problems.</p>
+<h3>A new Result dataframe: p-values and statistical significance of the features</h3>
+<pre><code class="python">
+df_result=pd.DataFrame()
+</code></pre>
+<pre><code class="python">
+df_result['pvalues']=fitted.pvalues[1:]
+</code></pre>
+<pre><code class="python">
+df_result['Features']=df.columns[:-1]
+</code></pre>
+<pre><code class="python">
+df_result.set_index('Features',inplace=True)
+</code></pre>
+<pre><code class="python">
+def yes_no(b):
+    if b:
+        return 'Yes'
+    else:
+        return 'No'
+</code></pre>
+<pre><code class="python">
+df_result['Statistically significant?']= df_result['pvalues'].apply(yes_no)
+</code></pre>
+<pre><code class="python">
+df_result
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>pvalues</th></p>
+<p><th>Statistically significant?</th></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Features</th></p>
+<p><th></th></p>
+<p><th></th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>Cement (component 1)(kg in a m^3 mixture)</th></p>
+<p><td>1.962842e-41</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Blast Furnace Slag (component 2)(kg in a m^3 mixture)</th></p>
+<p><td>1.633083e-23</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Fly Ash (component 3)(kg in a m^3 mixture)</th></p>
+<p><td>5.029952e-12</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Water  (component 4)(kg in a m^3 mixture)</th></p>
+<p><td>1.937337e-04</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Superplasticizer (component 5)(kg in a m^3 mixture)</th></p>
+<p><td>1.920901e-03</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Coarse Aggregate  (component 6)(kg in a m^3 mixture)</th></p>
+<p><td>5.522656e-02</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Fine Aggregate (component 7)(kg in a m^3 mixture)</th></p>
+<p><td>5.996805e-02</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>Age (day)</th></p>
+<p><td>5.841045e-82</td></p>
+<p><td>Yes</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<p>#### All the predicting variables are statisticall significant with the <a href="https://www.statsdirect.com/help/basics/p_values.htm" target="_blank" rel="noopener">threshold of p-value <0.01</a></p>
+<h3>Residuals vs. predicting variables plots</h3>
+<pre><code class="python">
+for c in df.columns[:-1]:
+    plt.figure(figsize=(8,5))
+    plt.title("{} vs. \nModel residuals".format(c),fontsize=16)
+    plt.scatter(x=df[c],y=fitted.resid,color='blue',edgecolor='k')
+    plt.grid(True)
+    xmin=min(df[c])
+    xmax = max(df[c])
+    plt.hlines(y=0,xmin=xmin*0.9,xmax=xmax*1.1,color='red',linestyle='--',lw=3)
+    plt.xlabel(c,fontsize=14)
+    plt.ylabel('Residuals',fontsize=14)
+    plt.show()
+</code></pre>
+<img src="output_39_0.png" alt="png">
+<img src="output_39_1.png" alt="png">
+<img src="output_39_2.png" alt="png">
+<img src="output_39_3.png" alt="png">
+<img src="output_39_4.png" alt="png">
+<img src="output_39_5.png" alt="png">
+<img src="output_39_6.png" alt="png">
+<img src="output_39_7.png" alt="png">
+<p>#### Residual plots show some bit of clustering but overall the assumptions linearity and independence seem to hold because the distribution seem random around the 0 axis.</p>
+<h3>Fitted vs. residuals</h3>
+<pre><code class="python">
+plt.figure(figsize=(8,5))
+p=plt.scatter(x=fitted.fittedvalues,y=fitted.resid,edgecolor='k')
+xmin=min(fitted.fittedvalues)
+xmax = max(fitted.fittedvalues)
+plt.hlines(y=0,xmin=xmin*0.9,xmax=xmax*1.1,color='red',linestyle='--',lw=3)
+plt.xlabel("Fitted values",fontsize=15)
+plt.ylabel("Residuals",fontsize=15)
+plt.title("Fitted vs. residuals plot",fontsize=18)
+plt.grid(True)
+plt.show()
+</code></pre>
+<img src="output_42_0.png" alt="png">
+<p>#### The fitted vs. residuals plot shows violation of the constant variance assumption - <a href="http://www.statsmakemecry.com/smmctheblog/confusing-stats-terms-explained-heteroscedasticity-heteroske.html" target="_blank" rel="noopener">Heteroscedasticity</a>.</p>
+<h3>Histogram of normalized residuals</h3>
+<pre><code class="python">
+plt.figure(figsize=(8,5))
+plt.hist(fitted.resid_pearson,bins=20,edgecolor='k')
+plt.ylabel('Count',fontsize=15)
+plt.xlabel('Normalized residuals',fontsize=15)
+plt.title("Histogram of normalized residuals",fontsize=18)
+plt.show()
+</code></pre>
+<img src="output_45_0.png" alt="png">
+<h3>Q-Q plot of the residuals</h3>
+<pre><code class="python">
+from statsmodels.graphics.gofplots import qqplot
+</code></pre>
+<pre><code class="python">
+plt.figure(figsize=(8,5))
+fig=qqplot(fitted.resid_pearson,line='45',fit='True')
+plt.xticks(fontsize=13)
+plt.yticks(fontsize=13)
+plt.xlabel("Theoretical quantiles",fontsize=15)
+plt.ylabel("Sample quantiles",fontsize=15)
+plt.title("Q-Q plot of normalized residuals",fontsize=18)
+plt.grid(True)
+plt.show()
+</code></pre>
+<p><Figure size 576x360 with 0 Axes></p>
+<img src="output_48_1.png" alt="png">
+<p>#### The Q-Q plot (and the histogram above) shows that the normality assumption is satisfied pretty good</p>
+<h3>Normality (Shapiro-Wilk) test of the residuals</h3>
+<pre><code class="python">
+from scipy.stats import shapiro
+</code></pre>
+<pre><code class="python">
+_,p=shapiro(fitted.resid)
+</code></pre>
+<pre><code class="python">
+if p&lt;0.01:
+    print("The residuals seem to come from Gaussian process")
+else:
+    print("The normality assumption may not hold")
+</code></pre>
+<p>The residuals seem to come from Gaussian process</p>
+<h3>Cook's distance (checking for outliers in residuals)</h3>
+<pre><code class="python">
+from statsmodels.stats.outliers_influence import OLSInfluence as influence
+</code></pre>
+<pre><code class="python">
+inf=influence(fitted)
+</code></pre>
+<pre><code class="python">
+(c, p) = inf.cooks_distance
+plt.figure(figsize=(8,5))
+plt.title("Cook's distance plot for the residuals",fontsize=16)
+plt.stem(np.arange(len(c)), c, markerfmt=",")
+plt.grid(True)
+plt.show()
+</code></pre>
+<img src="output_57_0.png" alt="png">
+<p>#### There are few data points with residuals being possible outliers</p>
+<h3>Variance inflation factor</h3>
+<pre><code class="python">
+from statsmodels.stats.outliers_influence import variance_inflation_factor as vif
+</code></pre>
+<pre><code class="python">
+for i in range(len(df1.columns[:-1])):
+    v=vif(np.matrix(df1[:-1]),i)
+    print("Variance inflation factor for {}: {}".format(df.columns[i],round(v,2)))
+</code></pre>
+<p>Variance inflation factor for Cement (component 1)(kg in a m^3 mixture): 26.23</p>
+<p>Variance inflation factor for Blast Furnace Slag (component 2)(kg in a m^3 mixture): 4.44</p>
+<p>Variance inflation factor for Fly Ash (component 3)(kg in a m^3 mixture): 4.56</p>
+<p>Variance inflation factor for Water  (component 4)(kg in a m^3 mixture): 92.59</p>
+<p>Variance inflation factor for Superplasticizer (component 5)(kg in a m^3 mixture): 5.52</p>
+<p>Variance inflation factor for Coarse Aggregate  (component 6)(kg in a m^3 mixture): 85.97</p>
+<p>Variance inflation factor for Fine Aggregate (component 7)(kg in a m^3 mixture): 73.46</p>
+<p>Variance inflation factor for Age (day): 2.43</p>
+<p>#### There are few features with VIF > 10, thereby indicating significant multicollinearity</p>
+    </div>
+    <div class="article-footer">
+        <p>原文链接: <a href="" target="_blank" rel="noopener"></a></p>
+        <p>原作者: Unknown | 许可证: BSD-2-CLAUSE</p>
+        <p style="margin-top:10px;">&copy; 2026 Anti-AI · 如需下架请联系: 247056714@qq.com</p>
+    </div>
+</body>
+</html>
