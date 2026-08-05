@@ -1,0 +1,182 @@
+[
+  {
+    "id": "216ab728",
+    "title": "Tutorial 4 (JAX): Optimization and Initialization",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "2d77308a",
+    "title": "Face Detection on Custom Dataset with Detectron2",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "3e05c2d5",
+    "title": "DNN - Tutorial 2 Part II: Physics inspired Machine Learning",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "6294c82a",
+    "title": "Multi-label Text Classification with BERT and PyTorch Lightning",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "6306b133",
+    "title": "Visual analytics and diagnostics of model fit for linear regression",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "BSD-2-CLAUSE",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "733f106f",
+    "title": "<a href=\"https://colab.research.google.com/github/gmihaila/ml_things/blob/master/notebooks/pytorch/v",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "7371bec9",
+    "title": "Resize images",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "GPL-3.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "87f0821a",
+    "title": "Interactive Plot   Plotly - Data-Science-Hacks",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "GPL-3.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "93b9f059",
+    "title": "Object Detection on a Custom Dataset using YOLO v5",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "9b0cb808",
+    "title": "<a href=\"https://colab.research.google.com/github/gmihaila/machine_learning_toolbox/blob/master/catb",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "a1d2d787",
+    "title": "Info",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "APACHE-2.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "b9de6858",
+    "title": "Tutorial 4: Optimization and Initialization",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "bd4b708f",
+    "title": "Synthetic Data Generation",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "BSD-2-CLAUSE",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "d1c0a3ff",
+    "title": "Clustering and dimeonsionality reduction techniques combined",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "BSD-2-CLAUSE",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "d8229773",
+    "title": "Image Augmentation   Article Shoot - Data-Science-Hacks",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "GPL-3.0",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "dc28977f",
+    "title": "Bigrams, Stemming, and Lemmatizing",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "ee3b0086",
+    "title": "Text Analysis Using `nltk.text`",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  },
+  {
+    "id": "fc7d9030",
+    "title": "Language Identifier Using Word Bigrams",
+    "author": "Unknown",
+    "source_url": "",
+    "license": "MIT",
+    "date": "2026-08-05",
+    "tags": [],
+    "summary": ""
+  }
+]
