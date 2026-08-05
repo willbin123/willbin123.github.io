@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Analysis Using `nltk.text` | Anti-AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.7; }
+        .nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 15px 20px; position: sticky; top: 0; z-index: 100; }
+        .nav a { color: #58a6ff; text-decoration: none; font-size: 1.1em; }
+        .article-header { max-width: 800px; margin: 0 auto; padding: 40px 20px 20px; border-bottom: 1px solid #30363d; }
+        .article-header h1 { font-size: 2em; color: #e6edf3; margin-bottom: 15px; }
+        .article-meta { color: #8b949e; font-size: 0.9em; display: flex; gap: 20px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-body { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+        .article-body h1, .article-body h2, .article-body h3 { color: #e6edf3; margin: 25px 0 12px; }
+        .article-body h2 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .article-body p { margin: 12px 0; }
+        .article-body a { color: #58a6ff; }
+        .article-body code { background: #1c2128; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 0.9em; color: #f0883e; }
+        .article-body pre { background: #1c2128; padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid #30363d; margin: 15px 0; }
+        .article-body pre code { background: none; padding: 0; color: #c9d1d9; }
+        .article-body img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+        .article-body blockquote { border-left: 3px solid #58a6ff; padding-left: 15px; margin: 15px 0; color: #8b949e; }
+        .article-body ul, .article-body ol { padding-left: 25px; margin: 12px 0; }
+        .article-footer { max-width: 800px; margin: 0 auto; padding: 20px; border-top: 1px solid #30363d; color: #8b949e; font-size: 0.85em; }
+        .article-footer a { color: #58a6ff; }
+        .disclaimer { background: rgba(136, 136, 136, 0.1); border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.85em; color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="/">&larr; 返回首页</a></div>
+    <div class="article-header">
+        <h1>Text Analysis Using `nltk.text`</h1>
+        <div class="article-meta">
+            <span>&#128197; 2026-08-05</span>
+            <span>&#128100; Unknown</span>
+            <span class="tag">MIT</span>
+            
+        </div>
+    </div>
+    <div class="article-body">
+        <div class="disclaimer"><p><strong>&#9888; 转载声明</strong></p><p>本文转载自 GitHub 开源项目，原作者: <strong>Unknown</strong></p><p>原文地址: <a href="" target="_blank" rel="noopener"></a></p><p>许可证: MIT</p></div>
+        <blockquote><strong>转载声明</strong> | 本文转载自 GitHub 开源项目 <a href="https://github.com/hb20007/hands-on-nltk-tutorial" target="_blank" rel="noopener">hb20007/hands-on-nltk-tutorial</a></blockquote>
+<blockquote>原作者: <strong>hb20007</strong> | 文件: <code>1-2-Text-Analysis-Using-nltk.text.ipynb</code></blockquote>
+<blockquote>许可证: MIT | Stars: ★573</blockquote>
+<blockquote>项目描述: The hands-on NLTK tutorial for NLP in Python</blockquote>
+<p>---</p>
+<h1>Text Analysis Using <code>nltk.text</code></h1>
+<h2>1. Tokenization</h2>
+<p>Before working with any text, we first need to <strong>tokenize</strong> it by splitting it into smaller, meaningful units (usually words) called <strong>tokens</strong>.</p>
+<pre><code>
+from nltk.tokenize import word_tokenize
+from nltk.text import Text
+</code></pre>
+<pre><code>
+lyrics_string = ''' Two plus two is four, minus one that's three — quick maths.
+                    Every day man's on the block. Smoke trees.
+                    See your girl in the park. That girl is an uckers.
+                    When the thing went quack quack quack, your men were ducking!
+                    Hold tight, Asznee, my brother. He's got a pumpy.
+                    Hold tight, my man, my guy. He's got a frisbee.'''
+tokens = word_tokenize(lyrics_string)
+tokens = [word.lower() for word in tokens]
+tokens[:5]
+</code></pre>
+<p>['two', 'plus', 'two', 'is', 'four']</p>
+<p>NLTK provides several other tokenizers apart from <code>word_tokenize</code>, such as <code>WhitespaceTokenizer</code>, which is similar to Python’s <code>string.split()</code>, and <code>BlanklineTokenizer</code>. We will see a few others in the next notebooks as well.</p>
+<h2>2. Analysis</h2>
+<pre><code>
+t = Text(tokens)
+t
+</code></pre>
+<p><Text: two plus two is four , minus one...></p>
+<pre><code>
+t.index('two')
+</code></pre>
+<p>0</p>
+<pre><code>
+t.count('quack')
+</code></pre>
+<p>3</p>
+<p>We can use the <code>concordance()</code> method of the <code>Text</code> class to display the <strong>context window</strong> for a given input of words. The default width is 79 characters.</p>
+<pre><code>
+t.concordance('uckers')
+</code></pre>
+<p>Displaying 1 of 1 matches:</p>
+<p>girl in the park . that girl is an uckers . when the thing went quack quack q</p>
+<p><code>collocations()</code> identifies <strong>collocations</strong>—words that often appear consecutively.</p>
+<pre><code>
+t.collocations()
+</code></pre>
+<p>hold tight; quack quack</p>
+<p><code>similar()</code> finds other words that appear in the same contexts as the specified word (<strong>distributional similarity</strong>), listing the most similar words first.</p>
+<pre><code>
+t.similar('brother')
+</code></pre>
+<p>guy</p>
+<p>A <strong>dispersion plot</strong> reveals patterns in word positions. Each stripe represents an instance of a word, and each row represents the entire text.</p>
+<pre><code>
+t.dispersion_plot(['maths', 'man', 'quack'])
+</code></pre>
+<img src="output_17_0.png" alt="png">
+<pre><code>
+t.vocab()
+</code></pre>
+<p>FreqDist({'.': 9, ',': 6, "'s": 4, 'the': 3, 'quack': 3, 'my': 3, 'two': 2, 'is': 2, 'that': 2, 'man': 2, ...})</p>
+<p><code>plot()</code> plots the 20 most common tokens.</p>
+<pre><code>
+t.plot(20)
+</code></pre>
+<p><Axes: xlabel='Samples', ylabel='Counts'></p>
+<img src="output_20_1.png" alt="png">
+<p>Another thing that might be useful in analysis is finding <strong>common contexts</strong>. Our text is too short, so we will use a longer one.</p>
+<p>NLTK comes with many interesting <strong>corpora</strong>, which are large collections of text. You can check out what corpora are found in <code>nltk.corpus</code> in <a href="http://www.nltk.org/book/ch02.html" target="_blank" rel="noopener">Chapter 2, Section 1 of the NLTK Book</a>. Actually, <code>nltk.corpus</code> contains <strong>corpus readers</strong>, which provide various methods to access each corpus.</p>
+<p><code>reuters</code> is a corpus of news documents. <code>words()</code> is one method corpus readers provide for reading data from a corpus. We will learn more about these methods in Section 2 of <a href="2-2-Detecting-Text-Language-by-Counting-Stop-Words.ipynb" target="_blank" rel="noopener">Notebook 2.2</a>. For now, we will use <code>words()</code> to read the corpus and then run <code>common_contexts()</code>, which takes a list of words and displays where they are used similarly. The underscores in the output indicate where the words would be in the text.</p>
+<pre><code>
+from nltk.corpus import reuters
+
+text = Text(reuters.words())
+text.common_contexts(['June', 'August'])
+</code></pre>
+<p>in_, in_. begins_1 in_1986 and_, in_and last_, -_, on_26 early_,</p>
+<p>/_shipment for_shipment -_. ,_, for_, and_. last_. in_the of_. on_12</p>
+<p>We will further explore the Reuters corpus as well as several others in later chapters.</p>
+    </div>
+    <div class="article-footer">
+        <p>原文链接: <a href="" target="_blank" rel="noopener"></a></p>
+        <p>原作者: Unknown | 许可证: MIT</p>
+        <p style="margin-top:10px;">&copy; 2026 Anti-AI</p>
+    </div>
+</body>
+</html>
