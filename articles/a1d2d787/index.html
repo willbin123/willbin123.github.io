@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info | Anti-AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0d1117; color: #c9d1d9; line-height: 1.7;
+        }
+        .nav {
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 15px 20px; position: sticky; top: 0; z-index: 100;
+        }
+        .nav a { color: #58a6ff; text-decoration: none; font-size: 1.1em; }
+        .nav a:hover { text-decoration: underline; }
+        .article-header {
+            max-width: 800px; margin: 0 auto; padding: 40px 20px 20px;
+            border-bottom: 1px solid #30363d;
+        }
+        .article-header h1 { font-size: 2em; color: #e6edf3; margin-bottom: 15px; }
+        .article-meta { color: #8b949e; font-size: 0.9em; display: flex; gap: 20px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-body {
+            max-width: 800px; margin: 0 auto; padding: 30px 20px;
+        }
+        .article-body h1, .article-body h2, .article-body h3 { color: #e6edf3; margin: 25px 0 12px; }
+        .article-body h1 { font-size: 1.6em; }
+        .article-body h2 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        .article-body h3 { font-size: 1.2em; }
+        .article-body p { margin: 12px 0; }
+        .article-body a { color: #58a6ff; }
+        .article-body code {
+            background: #1c2128; padding: 2px 6px; border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; color: #f0883e;
+        }
+        .article-body pre {
+            background: #1c2128; padding: 16px; border-radius: 8px; overflow-x: auto;
+            border: 1px solid #30363d; margin: 15px 0;
+        }
+        .article-body pre code { background: none; padding: 0; color: #c9d1d9; }
+        .article-body img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
+        .article-body blockquote {
+            border-left: 3px solid #58a6ff; padding-left: 15px; margin: 15px 0;
+            color: #8b949e;
+        }
+        .article-body ul, .article-body ol { padding-left: 25px; margin: 12px 0; }
+        .article-body li { margin: 6px 0; }
+        .article-body table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        .article-body th, .article-body td { border: 1px solid #30363d; padding: 8px 12px; text-align: left; }
+        .article-body th { background: #161b22; }
+        .article-footer {
+            max-width: 800px; margin: 0 auto; padding: 20px;
+            border-top: 1px solid #30363d; color: #8b949e; font-size: 0.85em;
+        }
+        .article-footer a { color: #58a6ff; }
+        .disclaimer {
+            background: rgba(136, 136, 136, 0.1); border: 1px solid #30363d;
+            border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.85em; color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="/">&larr; 返回首页</a></div>
+    <div class="article-header">
+        <h1>Info</h1>
+        <div class="article-meta">
+            <span>&#128197; 2026-08-05</span>
+            <span>&#128100; Unknown</span>
+            <span class="tag">APACHE-2.0</span>
+            
+        </div>
+    </div>
+    <div class="article-body">
+        
+                <div class="disclaimer">
+                    <p><strong>&#9888; 转载声明</strong></p>
+                    <p>本文转载自 GitHub 开源项目，原作者: <strong>Unknown</strong></p>
+                    <p>原文地址: <a href="" target="_blank" rel="noopener"></a></p>
+                    <p>许可证: APACHE-2.0</p>
+                </div>
+            
+        <blockquote><strong>转载声明</strong> | 本文转载自 GitHub 开源项目 <a href="https://github.com/gmihaila/ml_things" target="_blank" rel="noopener">gmihaila/ml_things</a></blockquote>
+<blockquote>原作者: <strong>gmihaila</strong> | 文件: <code>notebooks/old_notebooks/fn.ipynb</code></blockquote>
+<blockquote>许可证: APACHE-2.0 | Stars: ★266</blockquote>
+<blockquote>项目描述: This is where I put things I find useful that speed up my work with Machine Learning. Ever looked in your old projects to reuse those cool functions you created before? Well, this repo is designed to be a Python Library of functions I created in my previous project that can be reused. I also share some Notebooks Tutorials and Python Code Snippets.</blockquote>
+<hr>
+<h1>Info</h1>
+<p>Detect Fake news</p>
+<h3><a href="https://colab.research.google.com/drive/1Z8pgm3lAb-LEU2L0CPfHzVjpT_ktEDo2#offline=true&sandboxMode=true" target="_blank" rel="noopener">Run in Google Colab</a></h3>
+<h1>Install</h1>
+<pre><code class="">
+# install fix text
+!pip install -q ftfy
+</code></pre>
+<h2>Imports</h2>
+<pre><code class="">
+import os
+import io
+import numpy as np
+import pandas as pd
+import keras
+import nltk
+import requests
+from tqdm.notebook import tqdm
+import matplotlib.pyplot as plt
+import traceback
+import tensorflow as tf
+from ftfy import fix_text
+from sklearn.model_selection import train_test_split
+
+BUFFER_SIZE = 50000
+</code></pre>
+<p>Using TensorFlow backend.</p>
+<h1>Helper Functions</h1>
+<pre><code class="">
+def text_analysis_dialogues(path, save_tokenizer=False, lowercase=False,
+                            filters='!"#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n', use_top=50,
+                            font_size=22, plot_width=50, plot_height=8, plot_dpi=100,
+                            label_rotation=45, sentiment_path=".sentiments"):
+    """Text analysis statistics: number of tokens, length of sequences, different types of word frequencies.
+    If you decide to save tokenizer and want to load it:
+    with open(tokenizer_json) as f:
+        data = json.load(f)
+        tokenizer = keras.preprocessing.text.tokenizer_from_json(data)
+    Args:
+        path: Path of '.tsv' file or files directory.
+        save_tokenizer: Save tokenizer or not.
+        lowercase:
+        filters:
+        use_top:
+        font_size:
+        plot_width:
+        plot_height:
+        plot_dpi:
+        label_rotation:
+        sentiment_path:
+
+    Returns:
+        None
+    """
+    # set plot style
+    plt.style.use("seaborn-dark")
+    # variables
+    n_dialogues = 0
+    n_tokens_dialogues = []  # n_tokens_context + n_tokens_response
+    n_tokens_contexts = []
+    n_tokens_responses = []
+    tokenizer = keras.preprocessing.text.Tokenizer(num_words=None, filters=filters,
+                                                   lower=lowercase, split=' ')
+    # deal with stop words
+    nltk.download('wordnet')
+    nltk.download('stopwords')
+    stop_words = set(nltk.corpus.stopwords.words('english'))
+    # deal with sentiment words
+    sentiment_path = ".sentiments"
+    # files download urls
+    positive_url = "https://raw.githubusercontent.com/gmihaila/machine_learning_things/master/sentiments/positive-words.txt"
+    negative_url = "https://raw.githubusercontent.com/gmihaila/machine_learning_things/master/sentiments/negative-words.txt"
+    # build path
+    os.makedirs(sentiment_path) if not os.path.isdir(sentiment_path) else None
+    # create file paths
+    positive_path = os.path.join(sentiment_path, "positive-words.txt")
+    negative_path = os.path.join(sentiment_path, "negative-words.txt")
+    # download files
+    open(positive_path, 'wb').write(requests.get(positive_url).content) if not os.path.isfile(positive_path) else None
+    open(negative_path, 'wb').write(requests.get(negative_url).content) if not os.path.isfile(negative_path) else None
+    # read file
+    positive_words = io.open(positive_path, encoding='UTF-8').read().strip().split('\n')
+    negative_words = io.open(negative_path, encoding='UTF-8').read().strip().split('\n')
+
+    # check if path is folder
+    if os.path.isdir(path):
+        # get all file names in path
+        files = os.listdir(path)
+        image_path = os.path.join(path, "plot_%s.png" % os.path.basename(path))
+        tokenizer_json_path = os.path.join(path, "tokenizer_%s.json" % os.path.basename(path))
+
+    # check if path is file
+    elif os.path.isfile(path):
+        file_name = path.split('/')[-1]
+        files = [file_name]
+        file_id = os.path.basename(path)
+        file_id = file_id.split(".")[0]
+        output_path = os.path.dirname(path)
+        image_path = os.path.join(output_path, "plot_%s.png" % file_id)
+        tokenizer_json_path = os.path.join(output_path, "tokenizer_%s.json" % file_id)
+
+    else:
+        raise ValueError('ERROR: Invalid path or file.')
+
+    print("Parsing each file.")
+    for file_name in tqdm(files):
+        if len(files) == 1:
+            file_path = path
+        else:
+            file_path = os.path.join(path, file_name)
+
+        # read tsv file
+        try:
+            data_frame = pd.read_csv(filepath_or_buffer=file_path)
+            # get values
+            inputs = data_frame['title'].astype(str).values
+            outputs = data_frame['text'].astype(str).values
+            # fit tokenizer
+            tokenizer.fit_on_texts(inputs + outputs)
+            # number of instances
+            n_dialogues += len(inputs)
+            # count tokens
+            n_tokens_contexts += [len(context.split()) for context in inputs]
+            n_tokens_responses += [len(response.split()) for response in outputs]
+
+        except Exception as e:
+            print("ERROR: File/s need to be '.tsv'.")
+            print("ERROR: ", e, "\nTRACE:", traceback.format_exc())
+
+    n_tokens_dialogues += [n_con + n_resp for n_con, n_resp in zip(n_tokens_contexts, n_tokens_responses)]
+
+    tokens_details = {'Number of News': len(n_tokens_dialogues),
+                      'Number of Tokens': sum(n_tokens_dialogues),
+                      'Vocabulary Size': len(tokenizer.word_counts),
+                      'Average Tokens per Title-Text Pair': np.average(n_tokens_dialogues),
+                      'Average Tokens per Ttile': np.average(n_tokens_contexts),
+                      'Average Tokens per Text': np.average(n_tokens_responses)
+                      }
+    print("Finished 'tokens_details'.")
+
+    # save tokenizer
+    if save_tokenizer is True:
+        print("Saving tokenizer to %s" % tokenizer_json_path)
+        tokenizer_json = tokenizer.to_json()
+        with io.open(tokenizer_json_path, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(tokenizer_json, ensure_ascii=False))
+
+    # pos tagging
+    print("POS Tagging.")
+    pos_decode = {'n': 'NOUN', 'v': 'VERB', 'a': 'ADJECTIVE', 's': 'ADJECTIVE SATELITE', 'r': 'ADVERB'}
+    pos_counts = {name: 0 for name in pos_decode.values()}
+    for word, count in tokenizer.word_counts.items():
+        pos_tag = nltk.corpus.wordnet.synsets(word)
+        if len(pos_tag) &gt; 0:
+            pos_tag = pos_tag[0].pos()
+            pos_name = pos_decode[pos_tag]
+            pos_counts[pos_name] += 1
+
+    # all words
+    print("All words to DataFrame.")
+    words_counts_df = pd.DataFrame(list(tokenizer.word_counts.items()))
+    words_counts_df.columns = ["word", "count"]
+    words_counts_df = words_counts_df.sort_values('count', ascending=False).reset_index(drop=True)
+
+    # specific words
+    print("Filter 'only_stop_words_pd'.")
+    only_stop_words_pd = words_counts_df[[True if word in stop_words else False for word in
+                                          words_counts_df["word"]]][:use_top]
+    print("Filter 'without_stop_words_pd'.")
+    without_stop_words_pd = words_counts_df[[False if word in stop_words else True for word in
+                                             words_counts_df["word"]]][:use_top]
+
+    print("Filter 'using_positive_words_pd'.")
+    using_positive_words_pd = words_counts_df[[True if word in positive_words else False for word in
+                                               words_counts_df["word"]]][:use_top]
+    print("Filter 'using_negative_words_pd'.")
+    using_negative_words_pd = words_counts_df[[True if word in negative_words else False for word in
+                                               words_counts_df["word"]]][:use_top]
+
+    words_counts_df = words_counts_df[:use_top]
+
+    pos_counts_df = pd.DataFrame(list(pos_counts.items()))
+    pos_counts_df.columns = ["word", "count"]
+    pos_counts_df = pos_counts_df.sort_values('count', ascending=False).reset_index(drop=True)
+
+    # plots
+    print("Plotting.")
+    plt.rcParams.update({'font.size': font_size})
+
+    plots_dict = {"Data Tokens Details": tokens_details,
+                  "All Words": words_counts_df,
+                  "Without Stop Words": without_stop_words_pd,
+                  "Only Stop Words": only_stop_words_pd,
+                  "Only Positive Words": using_positive_words_pd,
+                  "Only Negative Words": using_negative_words_pd,
+                  "POS Tags Counts": pos_counts_df}
+
+    fig = plt.figure(figsize=(plot_width, plot_height * len(plots_dict) - 1))
+    fig.subplots_adjust(hspace=1)
+    fig.suptitle(t='Text Analysis Top %s Tokens' % use_top,
+                 fontweight='bold',
+                 fontsize=70)
+
+    # loop for each plot
+    for plot_index, (plot_name, plot_df) in enumerate(plots_dict.items()):
+        plt.subplot(len(plots_dict), 1, (plot_index + 1))
+
+        if plot_name == "Data Tokens Details":
+            # plot token details
+            text = "\n".join(["%s : %s" % (name, f"{int(value):,d}") for name, value in plot_df.items()])
+            # these are matplotlib.patch.Patch properties
+            props = dict(boxstyle='round', facecolor='w', alpha=0.5)
+            plt.axis('off')
+            # place a text box in upper left in axes coords
+            plt.text(0, 0, text, fontsize=2.5 * font_size,
+                     horizontalalignment='left',
+                     verticalalignment='bottom', bbox=props)
+        else:
+            # plot box plots
+            x_values = plot_df['word'].values
+            y_values = plot_df['count'].values
+            plt.title(plot_name)
+            plt.bar(x=x_values, height=y_values)
+            plt.ylabel('Count')
+            plt.xticks(rotation=label_rotation)
+            [plt.text(index - 0.1, value, f"{int(value):,d}", rotation=label_rotation) for index, value in
+             enumerate(y_values)];
+            plt.grid()
+    # save figure to image
+    print("Saving figure to %s" % image_path)
+    fig.savefig(fname=image_path, dpi=plot_dpi, bbox_inches='tight', pad_inches=0.5)
+    return
+
+
+
+def pad_numpy(variable_length_array, fixed_length):
+    """Pad variable length array to a fixed numpy array.
+    It can handle single arrays [1,2,3] or nested arrays [[1,2],[3]].
+    Args:
+        variable_length_array: Single arrays [1,2,3] or nested arrays [[1,2],[3]].
+        fixed_length: max length of rows for numpy.
+
+    Returns:
+        numpy_array: fixed numpy array shape [len of array X fixed_length].
+    """
+    # array of arrays
+    if isinstance(variable_length_array[0], list):
+        numpy_array = np.zeros((len(variable_length_array), fixed_length))
+        # verify each row
+        for numpy_row, array_row in zip(numpy_array, variable_length_array):
+            # concatenate array row if it is longer
+            array_row = array_row[:fixed_length]
+            numpy_row[:len(array_row)] = array_row
+        return numpy_array
+    # array of values
+    elif isinstance(variable_length_array, list):
+        numpy_array = np.zeros(fixed_length)
+        variable_length_array = variable_length_array[:fixed_length]
+        numpy_array[:len(variable_length_array)] = variable_length_array
+        return numpy_array
+    else:
+        print("Array is not a valid format.")
+        return None
+</code></pre>
+<h1>Text Analysis</h1>
+<pre><code class="">
+text_analysis_dialogues(path='/content/True.csv')
+text_analysis_dialogues(path='/content/Fake.csv')
+</code></pre>
+<p>[nltk_data] Downloading package wordnet to /root/nltk_data...</p>
+<p>[nltk_data]   Package wordnet is already up-to-date!</p>
+<p>[nltk_data] Downloading package stopwords to /root/nltk_data...</p>
+<p>[nltk_data]   Package stopwords is already up-to-date!</p>
+<p>Parsing each file.</p>
+<p>HBox(children=(FloatProgress(value=0.0, max=1.0), HTML(value='')))</p>
+<p>Finished 'tokens_details'.</p>
+<p>POS Tagging.</p>
+<p>All words to DataFrame.</p>
+<p>Filter 'only_stop_words_pd'.</p>
+<p>Filter 'without_stop_words_pd'.</p>
+<p>Filter 'using_positive_words_pd'.</p>
+<p>Filter 'using_negative_words_pd'.</p>
+<p>Plotting.</p>
+<p>Saving figure to /content/plot_True.png</p>
+<p>[nltk_data] Downloading package wordnet to /root/nltk_data...</p>
+<p>[nltk_data]   Package wordnet is already up-to-date!</p>
+<p>[nltk_data] Downloading package stopwords to /root/nltk_data...</p>
+<p>[nltk_data]   Package stopwords is already up-to-date!</p>
+<p>Parsing each file.</p>
+<p>HBox(children=(FloatProgress(value=0.0, max=1.0), HTML(value='')))</p>
+<p>Finished 'tokens_details'.</p>
+<p>POS Tagging.</p>
+<p>All words to DataFrame.</p>
+<p>Filter 'only_stop_words_pd'.</p>
+<p>Filter 'without_stop_words_pd'.</p>
+<p>Filter 'using_positive_words_pd'.</p>
+<p>Filter 'using_negative_words_pd'.</p>
+<p>Plotting.</p>
+<p>Saving figure to /content/plot_Fake.png</p>
+<img src="output_8_5.png" alt="png">
+<img src="output_8_6.png" alt="png">
+<h1>Concatenated Data</h1>
+<pre><code class="">
+fake_data_df = pd.read_csv('/content/Fake.csv')
+true_data_df = pd.read_csv('/content/True.csv')
+
+# add labels '0'-fake and '1' - true
+fake_data_df['label'] = [0]*len(fake_data_df)
+true_data_df['label'] = [1] * len(true_data_df)
+
+
+# append both data frames
+all_news = fake_data_df.append(true_data_df, ignore_index = True)
+
+# concatenate title and text
+all_news['title_text'] = ["%s %s"%(title,text) for title, text in \
+                          zip(all_news['title'].values, all_news['text'].values)]
+
+# re-arrange columsnto make them pretty
+all_news = all_news[['title_text', 'title', 'text', 'subject', 'date', 'label']]
+
+all_news.head()
+</code></pre>
+<p><div></p>
+<p><style scoped></p>
+<p>.dataframe tbody tr th:only-of-type {</p>
+<p>vertical-align: middle;</p>
+<p>}</p>
+<p>.dataframe tbody tr th {</p>
+<p>vertical-align: top;</p>
+<p>}</p>
+<p>.dataframe thead th {</p>
+<p>text-align: right;</p>
+<p>}</p>
+<p></style></p>
+<p><table border="1" class="dataframe"></p>
+<p><thead></p>
+<p><tr style="text-align: right;"></p>
+<p><th></th></p>
+<p><th>title_text</th></p>
+<p><th>title</th></p>
+<p><th>text</th></p>
+<p><th>subject</th></p>
+<p><th>date</th></p>
+<p><th>label</th></p>
+<p></tr></p>
+<p></thead></p>
+<p><tbody></p>
+<p><tr></p>
+<p><th>0</th></p>
+<p><td>Donald Trump Sends Out Embarrassing New Year’...</td></p>
+<p><td>Donald Trump Sends Out Embarrassing New Year’...</td></p>
+<p><td>Donald Trump just couldn t wish all Americans ...</td></p>
+<p><td>News</td></p>
+<p><td>December 31, 2017</td></p>
+<p><td>0</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>1</th></p>
+<p><td>Drunk Bragging Trump Staffer Started Russian ...</td></p>
+<p><td>Drunk Bragging Trump Staffer Started Russian ...</td></p>
+<p><td>House Intelligence Committee Chairman Devin Nu...</td></p>
+<p><td>News</td></p>
+<p><td>December 31, 2017</td></p>
+<p><td>0</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>2</th></p>
+<p><td>Sheriff David Clarke Becomes An Internet Joke...</td></p>
+<p><td>Sheriff David Clarke Becomes An Internet Joke...</td></p>
+<p><td>On Friday, it was revealed that former Milwauk...</td></p>
+<p><td>News</td></p>
+<p><td>December 30, 2017</td></p>
+<p><td>0</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>3</th></p>
+<p><td>Trump Is So Obsessed He Even Has Obama’s Name...</td></p>
+<p><td>Trump Is So Obsessed He Even Has Obama’s Name...</td></p>
+<p><td>On Christmas day, Donald Trump announced that ...</td></p>
+<p><td>News</td></p>
+<p><td>December 29, 2017</td></p>
+<p><td>0</td></p>
+<p></tr></p>
+<p><tr></p>
+<p><th>4</th></p>
+<p><td>Pope Francis Just Called Out Donald Trump Dur...</td></p>
+<p><td>Pope Francis Just Called Out Donald Trump Dur...</td></p>
+<p><td>Pope Francis used his annual Christmas Day mes...</td></p>
+<p><td>News</td></p>
+<p><td>December 25, 2017</td></p>
+<p><td>0</td></p>
+<p></tr></p>
+<p></tbody></p>
+<p></table></p>
+<p></div></p>
+<h1>Tokenize Data</h1>
+<pre><code class="">
+# create tokenizer
+tokenizer = tf.keras.preprocessing.text.Tokenizer()
+
+# make sure all text is in correct format
+print('Fixing text to make sure formatting is right...')
+all_text = [fix_text(text) for text in tqdm(all_news['title_text'].values)]
+all_labels = all_news['label'].values
+
+# fit tokenizer to allt text
+tokenizer.fit_on_texts(all_text)
+print('Fit tokenizer to all text and titles!')
+
+# get vocabulary size
+vocab_size = len(tokenizer.word_index)
+
+# get average length of text
+indexed_all_text = tokenizer.texts_to_sequences(all_text)
+avg_len = int(np.average([len(indexed_text) for indexed_text in indexed_all_text]))
+print('Average text length is: %d words.' % avg_len)
+
+# fix length all text
+numpy_all_text = pad_numpy(indexed_all_text, avg_len)
+print('Fixed length numpy matrix: ', numpy_all_text.shape)
+</code></pre>
+<p>Fixing text to make sure formatting is right...</p>
+<p>HBox(children=(FloatProgress(value=0.0, max=44898.0), HTML(value='')))</p>
+<p>Fit tokenizer to all text and titles!</p>
+<p>Average text length is: 427 words.</p>
+<p>Fixed length numpy matrix:  (44898, 427)</p>
+<h1>Split Train-Test</h1>
+<pre><code class="">
+text_train, text_test, labels_train, labels_test = train_test_split(numpy_all_text, all_labels, test_size=0.1, random_state=123)
+</code></pre>
+<h1>Train -Test Dataset</h1>
+<pre><code class="">
+BATCH_SIZE = 32
+
+# train dataset
+train_dataset = tf.data.Dataset.from_tensor_slices((text_train, labels_train))
+train_dataset = train_dataset.cache()
+train_dataset = train_dataset.shuffle(BUFFER_SIZE, seed=123, reshuffle_each_iteration=True)
+train_dataset = train_dataset.batch(BATCH_SIZE)
+
+# test dataset
+test_dataset = tf.data.Dataset.from_tensor_slices((text_test, labels_test))
+test_dataset = test_dataset.cache()
+test_dataset = test_dataset.batch(BATCH_SIZE)
+
+</code></pre>
+<h1>Build Model</h1>
+<pre><code class="">
+model = tf.keras.Sequential([
+            tf.keras.layers.Embedding(vocab_size, 16),
+            tf.keras.layers.GlobalAveragePooling1D(),
+            tf.keras.layers.Dense(1)])
+
+model.compile(optimizer='adam',
+              loss=tf.losses.BinaryCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+model.summary()
+</code></pre>
+<p>Model: "sequential_1"</p>
+<p>_________________________________________________________________</p>
+<p>Layer (type)                 Output Shape              Param #</p>
+<p>=================================================================</p>
+<p>embedding_1 (Embedding)      (None, None, 16)          2153712</p>
+<p>_________________________________________________________________</p>
+<p>global_average_pooling1d_1 ( (None, 16)                0</p>
+<p>_________________________________________________________________</p>
+<p>dense_1 (Dense)              (None, 1)                 17</p>
+<p>=================================================================</p>
+<p>Total params: 2,153,729</p>
+<p>Trainable params: 2,153,729</p>
+<p>Non-trainable params: 0</p>
+<p>_________________________________________________________________</p>
+<pre><code class="">
+history = model.fit(train_dataset,
+                    epochs=2,
+                    validation_data=test_dataset)
+</code></pre>
+<p>Epoch 1/2</p>
+<p>529/1263 [===========>..................] - ETA: 22s - loss: 0.5711 - accuracy: 0.5996</p>
+<hr>
+<p>InvalidArgumentError                      Traceback (most recent call last)</p>
+<p><ipython-input-22-97a68cd00980> in <module>()</p>
+<p>1 history = model.fit(train_dataset,</p>
+<p>2                     epochs=2,</p>
+<hr>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/keras/engine/training.py in _method_wrapper(self, <em>args, </em>*kwargs)</p>
+<p>64   def _method_wrapper(self, <em>args, </em>*kwargs):</p>
+<p>65     if not self._in_multi_worker_mode():  # pylint: disable=protected-access</p>
+<hr>
+<p>67</p>
+<p>68     # Running inside <code>run_distribute_coordinator</code> already.</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/keras/engine/training.py in fit(self, x, y, batch_size, epochs, verbose, callbacks, validation_split, validation_data, shuffle, class_weight, sample_weight, initial_epoch, steps_per_epoch, validation_steps, validation_batch_size, validation_freq, max_queue_size, workers, use_multiprocessing)</p>
+<p>846                 batch_size=batch_size):</p>
+<p>847               callbacks.on_train_batch_begin(step)</p>
+<p>--> 848               tmp_logs = train_function(iterator)</p>
+<p>849               # Catch OutOfRangeError for Datasets of unknown size.</p>
+<p>850               # This blocks until the batch has finished executing.</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/def_function.py in __call__(self, <em>args, </em>*kwds)</p>
+<p>578         xla_context.Exit()</p>
+<p>579     else:</p>
+<p>--> 580       result = self._call(<em>args, </em>*kwds)</p>
+<p>581</p>
+<p>582     if tracing_count == self._get_tracing_count():</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/def_function.py in _call(self, <em>args, </em>*kwds)</p>
+<p>609       # In this case we have created variables on the first call, so we run the</p>
+<p>610       # defunned version which is guaranteed to never create variables.</p>
+<p>--> 611       return self._stateless_fn(<em>args, </em>*kwds)  # pylint: disable=not-callable</p>
+<p>612     elif self._stateful_fn is not None:</p>
+<p>613       # Release the lock early so that multiple threads can perform the call</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/function.py in __call__(self, <em>args, </em>*kwargs)</p>
+<p>2418     with self._lock:</p>
+<p>2419       graph_function, args, kwargs = self._maybe_define_function(args, kwargs)</p>
+<p>-> 2420     return graph_function._filtered_call(args, kwargs)  # pylint: disable=protected-access</p>
+<p>2421</p>
+<p>2422   @property</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/function.py in _filtered_call(self, args, kwargs)</p>
+<p>1663          if isinstance(t, (ops.Tensor,</p>
+<p>1664                            resource_variable_ops.BaseResourceVariable))),</p>
+<p>-> 1665         self.captured_inputs)</p>
+<p>1666</p>
+<p>1667   def _call_flat(self, args, captured_inputs, cancellation_manager=None):</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/function.py in _call_flat(self, args, captured_inputs, cancellation_manager)</p>
+<p>1744       # No tape is watching; skip to running the function.</p>
+<p>1745       return self._build_call_outputs(self._inference_function.call(</p>
+<p>-> 1746           ctx, args, cancellation_manager=cancellation_manager))</p>
+<p>1747     forward_backward = self._select_forward_and_backward_functions(</p>
+<p>1748         args,</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/function.py in call(self, ctx, args, cancellation_manager)</p>
+<p>596               inputs=args,</p>
+<p>597               attrs=attrs,</p>
+<p>--> 598               ctx=ctx)</p>
+<p>599         else:</p>
+<p>600           outputs = execute.execute_with_cancellation(</p>
+<p>/usr/local/lib/python3.6/dist-packages/tensorflow/python/eager/execute.py in quick_execute(op_name, num_outputs, inputs, attrs, ctx, name)</p>
+<p>58     ctx.ensure_initialized()</p>
+<p>59     tensors = pywrap_tfe.TFE_Py_Execute(ctx._handle, device_name, op_name,</p>
+<hr>
+<p>61   except core._NotOkStatusException as e:</p>
+<p>62     if name is not None:</p>
+<p>InvalidArgumentError:  indices[22,134] = 134607 is not in [0, 134607)</p>
+<p>[[node sequential_1/embedding_1/embedding_lookup (defined at <ipython-input-22-97a68cd00980>:3) ]] [Op:__inference_train_function_1532]</p>
+<p>Errors may have originated from an input operation.</p>
+<p>Input Source operations connected to node sequential_1/embedding_1/embedding_lookup:</p>
+<p>sequential_1/embedding_1/embedding_lookup/1277 (defined at /usr/lib/python3.6/contextlib.py:81)</p>
+<p>Function call stack:</p>
+<p>train_function</p>
+    </div>
+    <div class="article-footer">
+        <p>原文链接: <a href="" target="_blank" rel="noopener"></a></p>
+        <p>原作者: Unknown | 许可证: APACHE-2.0</p>
+        <p style="margin-top:10px;">&copy; 2026 Anti-AI · 如需下架请联系: 247056714@qq.com</p>
+    </div>
+</body>
+</html>
