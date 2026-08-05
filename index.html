@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-AI | AI技术博客</title>
+    <meta name="description" content="转载优质 AI/ML 教程、Notebook 和技术文章">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid #30363d;
+        }
+        .header h1 { font-size: 2.8em; color: #58a6ff; margin-bottom: 10px; letter-spacing: 2px; }
+        .header .subtitle { color: #8b949e; font-size: 1.1em; }
+        .header .badge {
+            display: inline-block; margin-top: 15px; padding: 5px 15px;
+            background: rgba(88, 166, 255, 0.15); border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 20px; font-size: 0.85em; color: #58a6ff;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .section-title { font-size: 1.5em; color: #c9d1d9; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+        .article-list { display: grid; gap: 20px; }
+        .article-card {
+            background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+            padding: 25px; transition: border-color 0.3s, transform 0.2s;
+        }
+        .article-card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+        .article-card h2 { font-size: 1.3em; margin-bottom: 10px; }
+        .article-card h2 a { color: #58a6ff; text-decoration: none; }
+        .article-card h2 a:hover { text-decoration: underline; }
+        .article-meta { color: #8b949e; font-size: 0.85em; margin-bottom: 12px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .article-meta .tag { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 2px 10px; border-radius: 12px; }
+        .article-summary { color: #b1bac4; font-size: 0.95em; }
+        .footer { text-align: center; padding: 40px 20px; color: #8b949e; border-top: 1px solid #30363d; font-size: 0.85em; }
+        .footer a { color: #58a6ff; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .loading { text-align: center; padding: 40px; color: #8b949e; }
+        .source-link { display: inline-block; margin-top: 8px; font-size: 0.8em; color: #8b949e; }
+        .source-link a { color: #58a6ff; text-decoration: none; }
+        .search-box {
+            width: 100%; padding: 12px 20px; margin-bottom: 25px;
+            background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+            color: #c9d1d9; font-size: 1em; outline: none;
+        }
+        .search-box:focus { border-color: #58a6ff; }
+        .empty { text-align: center; padding: 60px 20px; color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Anti-AI</h1>
+        <p class="subtitle">AI 技术博客 · 转载优质 AI/ML 教程与 Notebook</p>
+        <span class="badge">Powered by GitHub Pages</span>
+    </div>
+    <div class="container">
+        <input type="text" class="search-box" id="search" placeholder="搜索文章..." oninput="filterArticles()">
+        <h2 class="section-title">文章列表</h2>
+        <div class="article-list" id="article-list">
+            <div class="loading">加载文章列表...</div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 Anti-AI · 所有文章版权归原作者所有，转载已标注来源</p>
+        <p style="margin-top:8px;"><a href="https://github.com/willbin123/willbin123.github.io">GitHub 仓库</a> · 如需下架请联系: 247056714@qq.com</p>
+    </div>
+    <script>
+        let allArticles = [];
+        fetch('/articles/index.json')
+            .then(r => r.json())
+            .then(articles => {
+                allArticles = articles;
+                renderArticles(articles);
+            })
+            .catch(() => {
+                document.getElementById('article-list').innerHTML = '<div class="empty">文章列表加载失败，请稍后刷新</div>';
+            });
+        function renderArticles(articles) {
+            const list = document.getElementById('article-list');
+            if (!articles || articles.length === 0) {
+                list.innerHTML = '<div class="empty">暂无文章</div>';
+                return;
+            }
+            list.innerHTML = articles.map(a => `
+                <div class="article-card">
+                    <h2><a href="/articles/${a.id}/index.html">${a.title}</a></h2>
+                    <div class="article-meta">
+                        <span>&#128197; ${a.date}</span>
+                        <span>&#128100; ${a.author}</span>
+                        ${a.license ? `<span class="tag">${a.license}</span>` : ''}
+                        ${a.tags ? a.tags.map(t => `<span class="tag">${t}</span>`).join('') : ''}
+                    </div>
+                    <p class="article-summary">${a.summary || '点击阅读全文'}</p>
+                    <div class="source-link">原文: <a href="${a.source_url}" target="_blank" rel="noopener">${a.source_url}</a></div>
+                </div>
+            `).join('');
+        }
+        function filterArticles() {
+            const q = document.getElementById('search').value.toLowerCase();
+            const filtered = allArticles.filter(a =>
+                a.title.toLowerCase().includes(q) ||
+                (a.author && a.author.toLowerCase().includes(q)) ||
+                (a.summary && a.summary.toLowerCase().includes(q)) ||
+                (a.tags && a.tags.some(t => t.toLowerCase().includes(q)))
+            );
+            renderArticles(filtered);
+        }
+    </script>
+</body>
+</html>
